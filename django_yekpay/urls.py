@@ -13,20 +13,20 @@ urlpatterns = [
         name='transactions_create',
     ),
     url(
-        regex="^transactions/(?P<pk>\d+)/~delete/$",
-        view=views.transactionsDeleteView.as_view(),
-        name='transactions_delete',
+        regex="^transactions/~verify/$",
+        view=views.verifyTransaction.as_view(),
+        name='transactions_create',
     ),
     url(
         regex="^transactions/(?P<pk>\d+)/$",
         view=views.transactionsDetailView.as_view(),
         name='transactions_detail',
     ),
-    url(
-        regex="^transactions/(?P<pk>\d+)/~update/$",
-        view=views.transactionsUpdateView.as_view(),
-        name='transactions_update',
-    ),
+    # url(
+    #     regex="^transactions/(?P<pk>\d+)/~update/$",
+    #     view=views.transactionsUpdateView.as_view(),
+    #     name='transactions_update',
+    # ),
     url(
         regex="^transactions/$",
         view=views.transactionsListView.as_view(),
