@@ -15,7 +15,7 @@ urlpatterns = [
     url(
         regex="^transactions/~verify/$",
         view=views.verifyTransaction.as_view(),
-        name='transactions_create',
+        name='transactions_verify',
     ),
     url(
         regex="^transactions/(?P<pk>\d+)/$",
