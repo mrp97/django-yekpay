@@ -8,7 +8,7 @@ from django.views.generic import (
 )
 
 from django.shortcuts import HttpResponseRedirect
-from django.urls import reverse
+from django.conf import settings
 
 from .models import (
     Transaction,
@@ -16,7 +16,7 @@ from .models import (
 from .config import *
 
 # constants
-MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID')
+MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
 
 
 def yekpay_start_transaction(transaction_data):
@@ -24,7 +24,7 @@ def yekpay_start_transaction(transaction_data):
 
     config = {
         "merchantId": MERCHANTID,
-        "callback": getattr(settings, 'YEKPAY_CALLBACK_URL')
+        "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', '')
     }
     data = {**config, **transaction_data}
 
@@ -64,9 +64,9 @@ def yekpay_proccess_transaction(request):
         return False
 
 
-class transactionsDetailView(DetailView):
-    model = transactions
-
-
-class transactionsListView(ListView):
-    model = transactions
+# class transactionsDetailView(DetailView):
+#     model = transactions
+#
+#
+# class transactionsListView(ListView):
+#     model = transactions
