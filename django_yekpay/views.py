@@ -25,7 +25,6 @@ def yekpay_start_transaction(transaction_data):
     config = {
         "merchantId": MERCHANTID,
         "callback": getattr('settings', 'YEKPAY_CALLBACK_URL')
-        'orderNumber' :
     }
     data = {**config, **transaction_data}
 
@@ -52,7 +51,7 @@ def yekpay_proccess_transaction(request):
     trans_status = dict(json.loads(response.text))
     if trans_status['Code'] == 100:
         # transaction_succeed
-        transaction = get(Transaction, authority=requests.GET['authority'])
+        transaction = Transaction.objects.get(Transaction, authority=requests.GET['authority'])
         transaction.status = 'success'
         transaction.save(update_fields=['status'])
         return True
