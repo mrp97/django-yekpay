@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests, json
+from time import time
 
 from django.views.generic import (
     UpdateView,
@@ -24,7 +25,8 @@ def yekpay_start_transaction(transaction_data):
 
     config = {
         "merchantId": MERCHANTID,
-        "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', '')
+        "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
+        'orderNumber': time()
     }
     data = {**config, **transaction_data}
 
@@ -33,11 +35,13 @@ def yekpay_start_transaction(transaction_data):
     response = requests.post(YEKPAY_REQUEST_GATEWAY, headers=headers, data=json_data)
     authority = dict(json.loads(response.text))
     if authority['Code'] == 100:
+        print('done')
         transaction = Transaction(authority=authority['Authority'], status='pending', **transaction_data)
         transaction.save()
-        HttpResponseRedirect(YEKPAY_START_GATEWAY + str(authority['Authority']))
+        return (YEKPAY_START_GATEWAY + str(authority['Authority']))
     else:
-        print(authority['Description'] + authority['Code'])
+        print('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
+
 
 def yekpay_proccess_transaction(request):
     global MERCHANTID
@@ -51,18 +55,18 @@ def yekpay_proccess_transaction(request):
     trans_status = dict(json.loads(response.text))
     if trans_status['Code'] == 100:
         # transaction_succeed
-        transaction = Transaction.objects.get(Transaction, authority=requests.GET['authority'])
+
+        transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
         transaction.status = 'success'
         transaction.save(update_fields=['status'])
         return True
 
     else:
         # transaction_failed
-        transaction = Transaction.objects.get(Transaction, authority=requests.GET['authority'])
+        transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
         transaction.status = 'failed'
         transaction.save(update_fields=['status'])
-        return False
-
+        return trans_status
 
 # class transactionsDetailView(DetailView):
 #     model = transactions
