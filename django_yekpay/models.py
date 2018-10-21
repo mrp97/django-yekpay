@@ -14,7 +14,7 @@ class Transaction(models.Model):
     lastName = models.CharField(max_length=225)
     email = models.CharField(max_length=225)
     mobile = models.CharField(max_length=225)
-    orderNumber = models.CharField(max_length=500)
+    orderNumber = models.IntegerField()
     address = models.CharField(max_length=225)
     country = models.CharField(max_length=225)
     postalCode= models.CharField(max_length=225)
