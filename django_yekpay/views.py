@@ -16,7 +16,7 @@ from .models import (
 from .config import *
 
 # constants
-MERCHANTID = getattr('settings', 'YEKPAY_MERCHANT_ID')
+MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID')
 
 
 def yekpay_start_transaction(transaction_data):
@@ -24,7 +24,7 @@ def yekpay_start_transaction(transaction_data):
 
     config = {
         "merchantId": MERCHANTID,
-        "callback": getattr('settings', 'YEKPAY_CALLBACK_URL')
+        "callback": getattr(settings, 'YEKPAY_CALLBACK_URL')
     }
     data = {**config, **transaction_data}
 
