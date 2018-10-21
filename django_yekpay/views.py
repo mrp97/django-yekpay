@@ -19,7 +19,7 @@ from .config import *
 MERCHANTID = getattr('settings', 'YEKPAY_MERCHANT_ID')
 
 
-def yekpay_start_transaction(request, transaction_data):
+def yekpay_start_transaction(transaction_data):
     global MERCHANTID
 
     config = {
@@ -53,14 +53,14 @@ def yekpay_proccess_transaction(request):
     if trans_status['Code'] == 100:
         # transaction_succeed
         transaction = get(Transaction, authority=requests.GET['authority'])
-        transaction.status = 'done'
+        transaction.status = 'success'
         transaction.save(update_fields=['status'])
         return True
 
     else:
         # transaction_failed
         transaction = get(Transaction, authority=requests.GET['authority'])
-        transaction.status = 'done'
+        transaction.status = 'failed'
         transaction.save(update_fields=['status'])
         return False
 
