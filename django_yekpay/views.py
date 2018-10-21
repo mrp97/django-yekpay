@@ -27,6 +27,9 @@ def yekpay_start_transaction(request, transaction_data):
         "callback": getattr('settings', 'YEKPAY_CALLBACK_URL')
     }
     data = {**config, **transaction_data}
+
+    transaction = Transaction(status='pending', **transaction_data,)
+    transaction.save()
     json_data = json.dumps(data)
     headers = {'Content-Type': 'application/json', 'Content-Length': str(len(json_data))}
     response = requests.post(YEKPAY_REQUEST_GATEWAY, headers=headers, data=json_data)
@@ -35,7 +38,6 @@ def yekpay_start_transaction(request, transaction_data):
         HttpResponseRedirect(YEKPAY_START_GATEWAY + str(authority['Authority']))
     else:
         print(authority['Description'] + authority['Code'])
-
 
 def yekpay_proccess_transaction(request):
     global MERCHANTID
@@ -50,6 +52,7 @@ def yekpay_proccess_transaction(request):
     if trans_status['Code'] == 100:
         return True
         # transaction_succeed
+
     else:
         return False
         # transaction_failed
