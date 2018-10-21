@@ -25,16 +25,17 @@ def yekpay_start_transaction(request, transaction_data):
     config = {
         "merchantId": MERCHANTID,
         "callback": getattr('settings', 'YEKPAY_CALLBACK_URL')
+        'orderNumber' :
     }
     data = {**config, **transaction_data}
 
-    transaction = Transaction(status='pending', **transaction_data,)
-    transaction.save()
     json_data = json.dumps(data)
     headers = {'Content-Type': 'application/json', 'Content-Length': str(len(json_data))}
     response = requests.post(YEKPAY_REQUEST_GATEWAY, headers=headers, data=json_data)
     authority = dict(json.loads(response.text))
     if authority['Code'] == 100:
+        transaction = Transaction(authority=authority['Authority'], status='pending', **transaction_data)
+        transaction.save()
         HttpResponseRedirect(YEKPAY_START_GATEWAY + str(authority['Authority']))
     else:
         print(authority['Description'] + authority['Code'])
@@ -50,12 +51,18 @@ def yekpay_proccess_transaction(request):
     response = requests.post(YEKPAY_VERIFY_GATEWAY, headers=headers, data=json_data)
     trans_status = dict(json.loads(response.text))
     if trans_status['Code'] == 100:
-        return True
         # transaction_succeed
+        transaction = get(Transaction, authority=requests.GET['authority'])
+        transaction.status = 'done'
+        transaction.save(update_fields=['status'])
+        return True
 
     else:
-        return False
         # transaction_failed
+        transaction = get(Transaction, authority=requests.GET['authority'])
+        transaction.status = 'done'
+        transaction.save(update_fields=['status'])
+        return False
 
 
 class transactionsDetailView(DetailView):
