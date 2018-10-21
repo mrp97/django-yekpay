@@ -58,7 +58,7 @@ def yekpay_proccess_transaction(request):
 
     else:
         # transaction_failed
-        transaction = get(Transaction, authority=requests.GET['authority'])
+        transaction = Transaction.objects.get(Transaction, authority=requests.GET['authority'])
         transaction.status = 'failed'
         transaction.save(update_fields=['status'])
         return False
