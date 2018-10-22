@@ -67,10 +67,10 @@ def yekpay_proccess_transaction(request):
             transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
             transaction.status = 'failed'
             transaction.save(update_fields=['status'])
-            print(trans_status)
+            logging.info(trans_status)
             return False
     else:
-        print(trans_status)
+        logging.error(trans_status)
         return 'there was a problem in payment'
 
 # class transactionsDetailView(DetailView):
