@@ -39,8 +39,9 @@ add  YEKPAY_MERCHANT_ID and YEKPAY_CALLBACK_URL with your data in the settings.p
 Usage
 ----------
 to use this module first get the information data from user and save it as a dict like this:
-.. code-block::
-data = {
+.. code-block:: python
+
+  data = {
         "amount": 1000,
         "description": "some plan",
         "fromCurrencyCode": 364, #you can change this to then currency you want
