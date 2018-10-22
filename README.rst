@@ -35,23 +35,35 @@ Add it to your `INSTALLED_APPS`:
         ...
     )
 
-Add Django yekpay's URL patterns:
-
+add  YEKPAY_MERCHANT_ID and YEKPAY_CALLBACK_URL with your data in the settings.py
+Usage
+----------
+to use this module first get the information data from user and save it as a dict like this:
 .. code-block:: python
-
-    from django_yekpay import urls as django_yekpay_urls
-
-
-    urlpatterns = [
-        ...
-        url(r'^', include(django_yekpay_urls)),
-        ...
-    ]
+    data = {
+        "amount": 1000,
+        "description": "some plan",
+        "fromCurrencyCode": 364, #you can change this to then currency you want
+        "toCurrencyCode": 364, #you can change this to then currency you want
+        "firstName": 'example',
+        "lastName": "example",
+        "email": "ex@example.com",
+        "mobile": "+4455884976",
+        "address": "somewhere",
+        "country": "Unaited Arab Emirates",
+        "postalCode": "64976",
+        "city": "Dubai",
+            }
+use the function yekpay_start_transaction(data) to start the transation and user will be redirected to yekpay's gateway and after completing
+transation yekpay will redirect to transation yekpay will redirect to YEKPAY_CALLBACK_URL you defined in setting.py earlier
+after that you can call the method yekpay_proccess_transaction(request) to verify if transation was successful or not in case of success it
+will return True and for fails it will return False(you can check terminal logs to see the error) and if there was something wrong with the payment it will return 'there was a problem in payment'
+(again, you can check terminal logs for error).after all the row for this transaction will be verified in the database.
 
 Features
 --------
 
-* TODO
+* easily multi currency transaction in django
 
 Running Tests
 -------------
