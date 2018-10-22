@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import requests, json
+import requests, json, logging
 from time import time
 
 from django.views.generic import (
@@ -35,7 +35,7 @@ def yekpay_start_transaction(transaction_data):
     response = requests.post(YEKPAY_REQUEST_GATEWAY, headers=headers, data=json_data)
     authority = dict(json.loads(response.text))
     if authority['Code'] == 100:
-        print('done')
+        print("redirecting to yekpay's gateway")
         transaction = Transaction(authority=authority['Authority'], status='pending', **transaction_data)
         transaction.save()
         return (YEKPAY_START_GATEWAY + str(authority['Authority']))
@@ -53,20 +53,25 @@ def yekpay_proccess_transaction(request):
     headers = {'Content-Type': 'application/json', 'Content-Length': str(len(json_data))}
     response = requests.post(YEKPAY_VERIFY_GATEWAY, headers=headers, data=json_data)
     trans_status = dict(json.loads(response.text))
-    if trans_status['Code'] == 100:
-        # transaction_succeed
+    if 'Code' in trans_status:
+        if trans_status['Code'] == 100:
+            # transaction_succeed
 
-        transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
-        transaction.status = 'success'
-        transaction.save(update_fields=['status'])
-        return True
+            transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
+            transaction.status = 'success'
+            transaction.save(update_fields=['status'])
+            return True
 
+        else:
+            # transaction_failed
+            transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
+            transaction.status = 'failed'
+            transaction.save(update_fields=['status'])
+            print(trans_status)
+            return False
     else:
-        # transaction_failed
-        transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
-        transaction.status = 'failed'
-        transaction.save(update_fields=['status'])
-        return trans_status
+        print(trans_status)
+        return 'there was a problem in payment'
 
 # class transactionsDetailView(DetailView):
 #     model = transactions
