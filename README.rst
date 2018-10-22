@@ -39,8 +39,8 @@ add  YEKPAY_MERCHANT_ID and YEKPAY_CALLBACK_URL with your data in the settings.p
 Usage
 ----------
 to use this module first get the information data from user and save it as a dict like this:
-.. code-block:: python
-    data = {
+.. code-block::
+data = {
         "amount": 1000,
         "description": "some plan",
         "fromCurrencyCode": 364, #you can change this to then currency you want
@@ -53,7 +53,7 @@ to use this module first get the information data from user and save it as a dic
         "country": "Unaited Arab Emirates",
         "postalCode": "64976",
         "city": "Dubai",
-            }
+}
 use the function yekpay_start_transaction(data) to start the transation and user will be redirected to yekpay's gateway and after completing
 transation yekpay will redirect to transation yekpay will redirect to YEKPAY_CALLBACK_URL you defined in setting.py earlier
 after that you can call the method yekpay_proccess_transaction(request) to verify if transation was successful or not in case of success it
