@@ -59,7 +59,7 @@ def yekpay_proccess_transaction(request):
                 return True
             elif status == 'FAILED':
                 # transaction_failed
-                transaction.failureReason = trans_status['PAYMENT_ERRORS]
+                transaction.failureReason = trans_status['PAYMENT_ERRORS']
                 transaction.save(update_fields=['status','failureReason'])
                 logging.info(trans_status)
                 return False
