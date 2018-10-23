@@ -15,7 +15,8 @@ MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
 
 def yekpay_start_transaction(transaction_data):
     global MERCHANTID
-
+    transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
+    transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
     transaction = Transaction.objects.create_transaction(transaction_data)
     config = {
         "merchantId": MERCHANTID,
@@ -76,6 +77,12 @@ def request_yekpay(gateway,data):
     headers = {'Content-Type': 'application/json', 'Content-Length': str(len(json_data))}
     response = requests.post(gateway, headers=headers, data=json_data)
     return dict(json.loads(response.text))
+
+def convert_currency_to_currency_code(currnecy):
+    if currnecy in CURRENCY_CODES:
+        return CURRENCY_CODES[currnecy]
+    else:
+        return None
 
 def convert_status_code_to_string(statusCode):
     if statusCode in TRANSACTION_STATUS_CODES:
