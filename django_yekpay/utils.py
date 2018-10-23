@@ -16,7 +16,7 @@ MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
 def yekpay_start_transaction(transaction_data):
     global MERCHANTID
 
-    transaction = Transaction(status='pending', **transaction_data)
+    transaction = Transaction(status='PENDING', **transaction_data)
     transaction.orderNumber = transaction.id
     config = {
         "merchantId": MERCHANTID,
