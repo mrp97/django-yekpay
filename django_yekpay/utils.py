@@ -15,14 +15,15 @@ MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
 
 def yekpay_start_transaction(transaction_data):
     global MERCHANTID
+    transaction = Transaction.objects.create_transaction(transaction_data)
     transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
     transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
-    transaction = Transaction.objects.create_transaction(transaction_data)
     config = {
         "merchantId": MERCHANTID,
         "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
-        'orderNumber': transaction.orderNumber
+        'orderNumber': transaction.orderNumber.id
     }
+    logging.info('start transaction',config['orderNumber'])
     start_transaction_data = {**config, **transaction_data}
     authority = request_yekpay(
         gateway=YEKPAY_REQUEST_GATEWAY,
@@ -30,6 +31,8 @@ def yekpay_start_transaction(transaction_data):
     )
     if authority['Code'] == 100:
         logging.info("returning redirecting url to yekpay's gateway")
+        transaction.authorityStart = str(authority['Authority'])
+        transaction.save()
         return (YEKPAY_START_GATEWAY + str(authority['Authority']))
     else:
         logging.info('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
@@ -47,22 +50,24 @@ def yekpay_proccess_transaction(request):
         data= verify_transaction_data
     )
     if 'Code' in trans_status:
+        logging.info('verfiy',trans_status['OrderNo'])
         transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
+        transaction.authorityVerify =  str(request.GET['authority'])
         status = convert_status_code_to_string(trans_status['Code'])
         if status:
             transaction.status = status
             if status == 'SUCCESS':
                 # transaction_succeed
-                transaction.save(update_fields=['status'])
+                transaction.save(update_fields=['status','authorityVerify'])
                 return True
             elif status == 'FAILED':
                 # transaction_failed
                 transaction.failureReason = trans_status['PAYMENT_ERRORS']
-                transaction.save(update_fields=['status','failureReason'])
+                transaction.save(update_fields=['status','authorityVerify','failureReason'])
                 logging.info(trans_status)
                 return False
             else:
-                transaction.save(update_fields=['status'])
+                transaction.save(update_fields=['status','authorityVerify'])
                 logging.info(trans_status)
                 return False
         else:
