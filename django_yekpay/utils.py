@@ -13,7 +13,13 @@ from .exceptions import *
 # constants
 MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
 
-def yekpay_start_transaction(transaction_data):
+def request_yekpay(gateway,data):
+    json_data = json.dumps(data)
+    headers = {'Content-Type': 'application/json', 'Content-Length': str(len(json_data))}
+    response = requests.post(gateway, headers=headers, data=json_data)
+    return dict(json.loads(response.text))
+
+def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
     global MERCHANTID
     transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
     transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
@@ -24,7 +30,7 @@ def yekpay_start_transaction(transaction_data):
         'orderNumber': transaction.orderNumber
     }
     start_transaction_data = {**config, **transaction_data}
-    authority = request_yekpay(
+    authority = request_function(
         gateway=YEKPAY_REQUEST_GATEWAY,
         data= start_transaction_data
     )
@@ -72,11 +78,7 @@ def yekpay_proccess_transaction(request):
         logging.error(trans_status)
         raise UnknownTransactionFailure('There was an unknown problem in payment!')
 
-def request_yekpay(gateway,data):
-    json_data = json.dumps(data)
-    headers = {'Content-Type': 'application/json', 'Content-Length': str(len(json_data))}
-    response = requests.post(gateway, headers=headers, data=json_data)
-    return dict(json.loads(response.text))
+
 
 def convert_currency_to_currency_code(currnecy):
     if currnecy in CURRENCY_CODES:
