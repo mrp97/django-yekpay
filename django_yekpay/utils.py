@@ -16,8 +16,7 @@ MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
 def yekpay_start_transaction(transaction_data):
     global MERCHANTID
 
-    transaction = Transaction(status='PENDING', **transaction_data)
-    transaction.orderNumber = transaction.id
+    transaction = Transaction.objects.create_transaction(transaction_data)
     config = {
         "merchantId": MERCHANTID,
         "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
@@ -29,12 +28,10 @@ def yekpay_start_transaction(transaction_data):
         data= start_transaction_data
     )
     if authority['Code'] == 100:
-        print("redirecting to yekpay's gateway")
-
-        transaction.save()
+        logging.info("returning redirecting url to yekpay's gateway")
         return (YEKPAY_START_GATEWAY + str(authority['Authority']))
     else:
-        print('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
+        logging.info('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
         return None
 
 def yekpay_proccess_transaction(request):
@@ -43,7 +40,7 @@ def yekpay_proccess_transaction(request):
         "merchantId": MERCHANTID,
         "authority": request.GET['authority']
     }
-    
+
     trans_status = request_yekpay(
         gateway=YEKPAY_VERIFY_GATEWAY,
         data= verify_transaction_data
