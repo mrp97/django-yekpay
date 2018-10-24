@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import requests, json, logging
+import requests, json, logging, uuid
 from time import time
 from django.shortcuts import HttpResponseRedirect
 from django.conf import settings
@@ -27,7 +27,7 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
     config = {
         "merchantId": MERCHANTID,
         "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
-        'orderNumber': transaction.orderNumber.id
+        'orderNumber': uuid.uuid4()
     }
     logging.info('start transaction',config['orderNumber'])
     start_transaction_data = {**config, **transaction_data}
