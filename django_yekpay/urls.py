@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import url
+from django.urls import path
 from django.views.generic import TemplateView
 
 from . import views
@@ -32,4 +33,18 @@ urlpatterns = [
     #     view=views.transactionsListView.as_view(),
     #     name='transactions_list',
     # ),
+    path('sanbox-transaction/<uuid:authoritys>',
+         views.sandbox_pay(),
+         name='sandbox-payment'
+    ),
+    url(
+        r'^sandbox-success/$',
+        views.success,
+        'sandbox-success'
+    ),
+    url(
+        r'^sandbox-fail/$',
+        views.failed,
+        'sandbox-fail'
+    )
 	]

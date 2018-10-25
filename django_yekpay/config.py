@@ -41,8 +41,8 @@ TRANSACTION_STATUS_CHIOCES = (
     ('MERCHANT_CODE_INCORRECT','Merchant code was incorrect'),
     ('MERCHANT_CODE_NOT_ACTIVE','Merchant code is not active'),
     ('AUTHORITY_CODE_INVALID', 'Authority code was invalid'),
-    ('ALREADY_VERIFIED', 'Transaction was already verfied'),
-    ('FAILDED', 'Transaction was failed'),
+    ('ALREADY_VERIFIED', 'Transaction was already verified'),
+    ('FAILED', 'Transaction was failed'),
     ('UNKNOWN', 'Transaction was failed with unknown error'),
     ('SUCCESS','Transaction was successfully done'),
 )

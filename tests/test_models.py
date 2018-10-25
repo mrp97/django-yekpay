@@ -10,7 +10,7 @@ Tests for `django-yekpay` models module.
 
 from django.test import TestCase
 
-from django_yekpay import models
+from django_yekpay import models,utils
 
 
 class TestDjango_yekpay(TestCase):
@@ -19,7 +19,22 @@ class TestDjango_yekpay(TestCase):
         pass
 
     def test_something(self):
-        pass
+        """tests if user get redirected to yekpay's gateway"""
+        transaction_data = {
+            "amount": 10000,
+            "description": "some plan",
+            "fromCurrencyCode": 'IRR',
+            "toCurrencyCode": 'IRR',
+            "firstName": 'ship',
+            "lastName": "up",
+            "email": "ex@example.com",
+            "mobile": "+4455884976",
+            "address": "tehran",
+            "country": "Unaited Arab Emirates",
+            "postalCode": "64976",
+            "city": "Dubai",
+        }
+        utils.yekpay_start_transaction(transaction_data,request_function=utils.sandbox_yekpay)
 
     def tearDown(self):
         pass

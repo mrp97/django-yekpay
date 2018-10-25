@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test Transaction</title>
+</head>
+<body>
+  <form action="{% url sandbox-success %}" method="get">
+    <input id="authoritys" type="hidden" name="authoritys" value="{{ authoritys }}">
+    <input id="authority" type="hidden" name="authority" value="{{ authorityv }}">
+    <input type="submit" value="success">
+  </form>
+
+  <form action="{% url sandbox-fail %}" method="get">
+    <input id="authoritys" type="hidden" name="authoritys" value="{{ authoritys }} ">
+    <input id="authority" type="hidden" name="authority" value="{{ authorityv }}">
+    <input type="submit" value="failed">
+  </form>
+</body>
+</html>
