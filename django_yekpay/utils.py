@@ -12,6 +12,7 @@ from .exceptions import *
 
 # constants
 MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
+logging.basicConfig(level=logging.DEBUG)
 
 def request_yekpay(gateway,data):
     json_data = json.dumps(data)
@@ -27,7 +28,7 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
     config = {
         "merchantId": MERCHANTID,
         "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
-        'orderNumber': uuid.uuid4()
+        'orderNumber': transaction.orderNumber.id
     }
     logging.info('start transaction',config['orderNumber'])
     start_transaction_data = {**config, **transaction_data}
@@ -41,7 +42,7 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
         transaction.save()
         return (YEKPAY_START_GATEWAY + str(authority['Authority']))
     else:
-        logging.info('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
+        logging.error('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
         return None
 
 def yekpay_proccess_transaction(request):
