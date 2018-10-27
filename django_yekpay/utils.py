@@ -38,11 +38,14 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
             gateway=YEKPAY_REQUEST_GATEWAY,
             data= start_transaction_data
         )
+        respone = list()
         if authority['Code'] == 100:
             logging.info("returning redirecting url to yekpay's gateway")
             transaction.authorityStart = str(authority['Authority'])
             transaction.save()
-            return (YEKPAY_START_GATEWAY + str(authority['Authority']))
+            respone.append(YEKPAY_START_GATEWAY + str(authority['Authority']))
+            respone.append(authority)
+            return respone
         else:
             logging.error('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
             return None
@@ -64,18 +67,18 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
         transaction.save(update_fields=['authorityStart'])
         reverse('django_yekpay:sandbox-payment', kwargs={'authoritys': authority})
 
-def yekpay_process_transaction(request):
+def yekpay_process_transaction(request, trans_status=None):
     if not Test:
         global MERCHANTID
         verify_transaction_data = {
             "merchantId": MERCHANTID,
             "authority": request.GET['authority']
         }
-
-        trans_status = request_yekpay(
-            gateway=YEKPAY_VERIFY_GATEWAY,
-            data= verify_transaction_data
-        )
+        if trans_status == None:
+            trans_status = request_yekpay(
+                gateway=YEKPAY_VERIFY_GATEWAY,
+                data= verify_transaction_data
+            )
         if 'Code' in trans_status:
             status = convert_status_code_to_string(trans_status['Code'])
             if status == 'SUCCESS':
@@ -92,6 +95,8 @@ def yekpay_process_transaction(request):
                         transaction.failureReason = trans_status['Description']
                     transaction.save(update_fields=['status','authorityVerify','failureReason'])
                     logging.info(trans_status)
+                    return False
+                else:
                     return False
 
     else:
