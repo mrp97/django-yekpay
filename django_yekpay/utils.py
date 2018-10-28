@@ -9,6 +9,7 @@ from .models import (
 )
 from .config import *
 from .exceptions import *
+from tests
 
 # constants
 MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
@@ -32,6 +33,8 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
             "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
             'orderNumber': transaction.orderNumber.id
         }
+        transaction.redirect_url = config['callback']
+        transaction.save(update_fields=['redirect_url'])
         logging.info('start transaction',config['orderNumber'])
         start_transaction_data = {**config, **transaction_data}
         authority = request_function(
@@ -65,20 +68,19 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
         )
         transaction.authorityStart = str(authority)
         transaction.save(update_fields=['authorityStart'])
-        reverse('django_yekpay:sandbox-payment', kwargs={'authoritys': authority})
+        return reverse('django_yekpay:sandbox-payment', kwargs={'authoritys': authority})
 
-def yekpay_process_transaction(request, trans_status=None):
+def yekpay_process_transaction(request, request_function=request_yekpay):
     if not Test:
         global MERCHANTID
         verify_transaction_data = {
             "merchantId": MERCHANTID,
             "authority": request.GET['authority']
         }
-        if trans_status == None:
-            trans_status = request_yekpay(
-                gateway=YEKPAY_VERIFY_GATEWAY,
-                data= verify_transaction_data
-            )
+        trans_status = request_function(
+            gateway=YEKPAY_VERIFY_GATEWAY,
+            data= verify_transaction_data
+        )
         if 'Code' in trans_status:
             status = convert_status_code_to_string(trans_status['Code'])
             if status == 'SUCCESS':
@@ -149,6 +151,4 @@ def convert_status_code_to_string(statusCode):
     else:
         return None
 
-def sandbox_yekpay_start(gateway, data):
-    response = uuid.uuid4()
-    return response
+
