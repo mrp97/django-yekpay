@@ -7,10 +7,11 @@ test_django-yekpay
 
 Tests for `django-yekpay` utils module.
 """
+from django_yekpay import models,utils,config
+from tests import sandbox_api
 
 from django.test import TestCase
-
-from django_yekpay import models,utils,config
+from django.http import  HttpRequest
 
 
 class TestDjango_yekpay_utils(TestCase):
@@ -34,6 +35,7 @@ class TestDjango_yekpay_utils(TestCase):
         transaction.orderNumber = 1
         transaction.save(update_fields=['orderNumber'])
 
+
     def test_yekpay_start_transaction_returns_gateway(self):
         """tests if user get redirected to yekpay's gateway"""
         transaction_data = {
@@ -55,25 +57,30 @@ class TestDjango_yekpay_utils(TestCase):
         self.assertIn('Authority', response[1])
         self.assertIn('Description', response[1])
 
+
     def test_yekpay_process_transaction_retrun_false_for_failed(self):
         """tests if process transaction """
-        verify_transaction_data = {
-            'Code': -10,
-            'Description': 'payment is incomplete with error',
-        }
-        response = utils.yekpay_process_transaction(None,verify_transaction_data)
+        request = HttpRequest()
+        request.method = 'Get'
+        request.META['authority'] = 0
+        response = utils.yekpay_process_transaction(
+            request,
+            sandbox_api.sandbox_yekpay_failed_transaction
+        )
         self.assertFalse(response)
 
-    def test_yekpay_process_transaction_return_ture_for_success(self):
+
+    def test_yekpay_process_transaction_return_true_for_success(self):
         """tests if process transaction returns true for code 100"""
-        verify_transaction_data = {
-            'Code': 100,
-            'Description': 'paymenet was successful'
-        }
+        request = HttpRequest()
+        request.method = 'Get'
+        request.META['authority'] = 0
         response = utils.yekpay_process_transaction(
-            None,verify_transaction_data
+            request,
+            sandbox_api.sandbox_yekpay_success_transaction
         )
         self.assertTrue(response)
+
 
     def tearDown(self):
         pass
