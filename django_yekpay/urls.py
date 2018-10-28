@@ -34,7 +34,7 @@ urlpatterns = [
     #     name='transactions_list',
     # ),
     path('sanbox-transaction/<uuid:authoritys>',
-         views.sandbox_pay(),
+         views.sandbox_pay,
          name='sandbox-payment'
     ),
     url(
