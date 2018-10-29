@@ -9,7 +9,6 @@ from .models import (
 )
 from .config import *
 from .exceptions import *
-from tests
 
 # constants
 MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
@@ -41,14 +40,14 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
             gateway=YEKPAY_REQUEST_GATEWAY,
             data= start_transaction_data
         )
-        respone = list()
+        response = list()
         if authority['Code'] == 100:
             logging.info("returning redirecting url to yekpay's gateway")
             transaction.authorityStart = str(authority['Authority'])
             transaction.save()
-            respone.append(YEKPAY_START_GATEWAY + str(authority['Authority']))
-            respone.append(authority)
-            return respone
+            response.append(YEKPAY_START_GATEWAY + str(authority['Authority']))
+            response.append(authority)
+            return response
         else:
             logging.error('django_yekpay error' + str(authority['Description']) + str(authority['Code']))
             return None
