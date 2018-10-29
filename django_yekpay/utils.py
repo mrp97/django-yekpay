@@ -27,11 +27,17 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
         transaction = Transaction.objects.create_transaction(transaction_data)
         transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
         transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
-        config = {
-            "merchantId": MERCHANTID,
-            "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
-            'orderNumber': transaction.orderNumber.id
-        }
+        if 'callback' in transaction_data:
+            config = {
+                "merchantId": MERCHANTID,
+                'orderNumber': transaction.orderNumber.id
+            }
+        else:
+            config = {
+                "merchantId": MERCHANTID,
+                "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
+                'orderNumber': transaction.orderNumber.id
+            }
         transaction.redirect_url = config['callback']
         transaction.save(update_fields=['redirect_url'])
         logging.info('start transaction',config['orderNumber'])
