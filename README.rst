@@ -47,6 +47,7 @@ to use this module first get the information data from user and save it as a dic
         "fromCurrencyCode": 364, #you can change this to then currency you want
         "toCurrencyCode": 364, #you can change this to then currency you want
         "firstName": 'example',
+        "callback" : "someurl" # optional, you can set it in settings too
         "lastName": "example",
         "email": "ex@example.com",
         "mobile": "+4455884976",
@@ -55,8 +56,9 @@ to use this module first get the information data from user and save it as a dic
         "postalCode": "64976",
         "city": "Dubai",
 }
-use the function yekpay_start_transaction(data) to start the transation and user will be redirected to yekpay's gateway and after completing
-transation yekpay will redirect to transation yekpay will redirect to YEKPAY_CALLBACK_URL you defined in setting.py earlier
+use the function yekpay_start_transaction(data) to start the transation and you will get a dictionary back it's [0] index is the urls
+you can use and user will be redirected to yekpay's gateway and after completing
+transation yekpay will redirect to transation yekpay will redirect to YEKPAY_CALLBACK_URL you defined in setting.py earlier(or in transaction_data)
 after that you can call the method yekpay_proccess_transaction(request) to verify if transation was successful or not in case of success it
 will return True and for fails it will return False(you can check terminal logs to see the error) and if there was something wrong with the payment it will return 'there was a problem in payment'
 (again, you can check terminal logs for error).after all the row for this transaction will be verified in the database.
@@ -65,6 +67,7 @@ Features
 --------
 
 * easily multi currency transaction in django
+* a sandbox mode to test the payment system before pay for it.
 
 Running Tests
 -------------
@@ -76,6 +79,10 @@ Does the code actually work?
     source <YOURVIRTUALENV>/bin/activate
     (myenv) $ pip install tox
     (myenv) $ tox
+
+you can also use the sandbox mode in order to test it by yourself.
+set YEKPAY_TEST = True in your settings.you just fireup sandbox mode by using function yekpay_start_transaction with your transaction_data(merchantid is not necessary)
+this will redirect user to a page that user can choose between failed and success transaction then redirected to your callback url to check whether it was successful or not.
 
 Credits
 -------
