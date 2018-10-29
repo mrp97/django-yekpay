@@ -62,10 +62,17 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay):
         transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
         transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
         transaction = Transaction.objects.create_transaction(transaction_data)
-        config = {
-            "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
-            'orderNumber': transaction.orderNumber.id
-        }
+        if 'callback' in transaction_data:
+            config = {
+                'orderNumber': transaction.orderNumber.id
+            }
+        else:
+            config = {
+                "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
+                'orderNumber': transaction.orderNumber.id
+            }
+        transaction.redirect_url = config['callback']
+        transaction.save(update_fields=['redirect_url'])
         start_transaction_data = {**config, **transaction_data}
         authority = request_function(
             gateway=YEKPAY_REQUEST_GATEWAY,
