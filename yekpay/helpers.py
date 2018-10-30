@@ -14,15 +14,11 @@ from .request_utils import ( request_yekpay, request_yekpay_start,
 from .utils import ( convert_status_code_to_string,
     convert_currency_to_currency_code, get_call_back_url )
 
-# constants
-MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
-YEKPAY_SIMULATION = getattr(settings, 'YEKPAY_SIMULATION', False)
 logging.basicConfig(level=logging.DEBUG)
 
 def yekpay_start_transaction(transaction_data,request_function=request_yekpay_start):
     if YEKPAY_SIMULATION:
         request_function = request_yekpay_start_simulation
-    global MERCHANTID
     transaction_data['callback_url']= get_call_back_url(transaction_data)
     transaction = Transaction.objects.create_transaction(transaction_data)
     transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
