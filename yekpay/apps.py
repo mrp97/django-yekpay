@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 
 class DjangoYekpayConfig(AppConfig):
-    name = 'django_yekpay'
+    name = 'yekpay'
