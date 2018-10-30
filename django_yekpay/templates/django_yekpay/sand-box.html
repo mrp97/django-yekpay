@@ -5,13 +5,13 @@
     <title>test Transaction</title>
 </head>
 <body>
-  <form action="{% url sandbox-success %}" method="get">
+  <form action="{% url 'yekpay:sandbox-success' %}" method="get">
     <input id="authoritys" type="hidden" name="authoritys" value="{{ authoritys }}">
     <input id="authority" type="hidden" name="authority" value="{{ authorityv }}">
     <input type="submit" value="success">
   </form>
 
-  <form action="{% url sandbox-fail %}" method="get">
+  <form action="{% url 'yekpay:sandbox-fail' %}" method="get">
     <input id="authoritys" type="hidden" name="authoritys" value="{{ authoritys }} ">
     <input id="authority" type="hidden" name="authority" value="{{ authorityv }}">
     <input type="submit" value="failed">

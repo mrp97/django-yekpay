@@ -40,11 +40,11 @@ urlpatterns = [
     url(
         r'^sandbox-success/$',
         views.success,
-        'sandbox-success'
+        name='sandbox-success'
     ),
     url(
         r'^sandbox-fail/$',
-        views.failed,
-        'sandbox-fail'
+        views.fail,
+        name='sandbox-fail'
     )
 	]

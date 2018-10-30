@@ -10,7 +10,7 @@ from django.views.generic import (
     ListView
 )
 
-from .utils import yekpay_process_transaction
+from .helpers import yekpay_process_transaction
 
 def sandbox_pay(request, authoritys):
     return render(request,
