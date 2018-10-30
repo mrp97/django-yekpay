@@ -1,7 +1,15 @@
 from random import randint
 
-from .config import CURRENCY_CODES, TRANSACTION_STATUS_CODES
+from .config import *
 from .exceptions import *
+
+def generate_yekpay_start_transaction_data(transaction_data):
+    start_transaction_data = dict()
+    start_transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
+    start_transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
+    start_transaction_data['merchantId'] = MERCHANTID
+    start_transaction_data['orderNumber'] = transaction_data['order_number']
+    return start_transaction_data
 
 def convert_currency_to_currency_code(currnecy):
     if currnecy in CURRENCY_CODES:

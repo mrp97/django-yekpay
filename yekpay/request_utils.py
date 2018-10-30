@@ -2,7 +2,7 @@ import json, requests, uuid
 
 from django.urls import reverse
 
-from .config import YEKPAY_START_GATEWAY, YEKPAY_REQUEST_GATEWAY, YEKPAY_VERIFY_GATEWAY
+from .config import *
 from .models import Transaction
 from .utils import generate_random_authority, convert_string_status_to_code
 
