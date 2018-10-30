@@ -5,5 +5,5 @@ from django.conf.urls import url, include
 
 
 urlpatterns = [
-    url(r'^', include('django_yekpay.urls', namespace='django_yekpay')),
+    url(r'^', include('yekpay.urls', namespace='yekpay')),
 ]

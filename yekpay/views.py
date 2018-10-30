@@ -8,7 +8,7 @@ def sandbox_pay(request, authority_start):
     if request.method == 'GET':
         return render(
             request,
-            'django_yekpay/sand-box.html'
+            'yekpay/sand-box.html'
         )
     elif request.method == 'POST':
         transaction = Transaction.objects.get(authorityStart= authority_start)

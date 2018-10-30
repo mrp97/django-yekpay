@@ -7,7 +7,7 @@ test_django-yekpay
 
 Tests for `django-yekpay` utils module.
 """
-from django_yekpay import models,utils,config
+from yekpay import models,utils,config
 from tests import sandbox_api
 
 from django.test import TestCase
