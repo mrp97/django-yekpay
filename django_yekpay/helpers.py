@@ -9,8 +9,10 @@ from .models import (
 from .config import *
 from .exceptions import *
 from .request_utils import ( request_yekpay, request_yekpay_start,
-    request_yekpay_simulation )
-from .utils import convert_status_code_to_string, convert_currency_to_currency_code
+    request_yekpay_verify, request_yekpay_start_simulation,
+    request_yekpay_verify_simulation )
+from .utils import ( convert_status_code_to_string,
+    convert_currency_to_currency_code, get_call_back_url )
 
 # constants
 MERCHANTID = getattr(settings, 'YEKPAY_MERCHANT_ID', '')
@@ -19,24 +21,16 @@ logging.basicConfig(level=logging.DEBUG)
 
 def yekpay_start_transaction(transaction_data,request_function=request_yekpay_start):
     if YEKPAY_SIMULATION:
-        request_function = request_yekpay_simulation
+        request_function = request_yekpay_start_simulation
     global MERCHANTID
+    transaction_data['callback_url']= get_call_back_url(transaction_data)
     transaction = Transaction.objects.create_transaction(transaction_data)
     transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
     transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
-    if 'callback' in transaction_data:
-        config = {
-            "merchantId": MERCHANTID,
-            'orderNumber': transaction.orderNumber.id
-        }
-    else:
-        config = {
-            "merchantId": MERCHANTID,
-            "callback": getattr(settings, 'YEKPAY_CALLBACK_URL', ''),
-            'orderNumber': transaction.orderNumber.id
-        }
-    transaction.redirect_url = config['callback']
-    transaction.save(update_fields=['redirect_url'])
+    config = {
+        "merchantId": MERCHANTID,
+        'orderNumber': transaction.orderNumber.id
+    }
     logging.info('start transaction',config['orderNumber'])
     start_transaction_data = {**config, **transaction_data}
     yekpay_response_data = request_function(
@@ -51,15 +45,15 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay_st
         logging.error('django_yekpay error' + str(yekpay_response_data['Description']) + str(yekpay_response_data['Code']))
         return None
 
-def yekpay_process_transaction(request, request_function=request_yekpay):
-
+def yekpay_process_transaction(request, request_function=request_yekpay_verify):
+    if YEKPAY_SIMULATION:
+        request_function = request_yekpay_verify_simulation
     global MERCHANTID
     verify_transaction_data = {
         "merchantId": MERCHANTID,
         "authority": request.GET['authority']
     }
     trans_status = request_function(
-        gateway=YEKPAY_VERIFY_GATEWAY,
         data= verify_transaction_data
     )
     if 'Code' in trans_status:
@@ -68,6 +62,7 @@ def yekpay_process_transaction(request, request_function=request_yekpay):
             transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
             transaction.authorityVerify = str(request.GET['authority'])
             transaction.save(update_fields=['status', 'authorityVerify'])
+            return True
         elif status == 'FAILED':
             if 'OrderNo' in trans_status:
                 transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])

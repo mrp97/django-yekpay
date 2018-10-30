@@ -7,3 +7,6 @@ class UnknownTransactionFailure(YekpayException):
 
 class UnknownTransactionStatusCode(YekpayException):
     """ Unknown transaction status code """
+
+class CallbackUrlNotProvided(YekpayException):
+    """ callback url is not provided in transaction data or project settings """

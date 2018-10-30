@@ -6,7 +6,7 @@ from django.views.generic import TemplateView
 from . import views
 
 
-app_name = 'django_yekpay'
+app_name = 'yekpay'
 urlpatterns = [
     # url(
     #     regex="^transactions/~create/$",
@@ -33,18 +33,8 @@ urlpatterns = [
     #     view=views.transactionsListView.as_view(),
     #     name='transactions_list',
     # ),
-    path('sanbox-transaction/<uuid:authoritys>',
+    path('sanbox-transaction/<int:authority_start>',
          views.sandbox_pay,
          name='sandbox-payment'
     ),
-    url(
-        r'^sandbox-success/$',
-        views.success,
-        name='sandbox-success'
-    ),
-    url(
-        r'^sandbox-fail/$',
-        views.fail,
-        name='sandbox-fail'
-    )
 	]

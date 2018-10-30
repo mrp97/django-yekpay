@@ -11,7 +11,7 @@ class Transaction(models.Model):
     authorityStart = models.CharField(max_length=100,blank=True,null=True) #by module
     authorityVerify = models.CharField(max_length=100,blank=True,null=True) #by module
     description = models.TextField()
-    redirect_url = models.CharField(max_length=100)
+    callback_url = models.CharField(max_length=100)
     fromCurrencyCode = models.CharField(max_length=4, choices= CURRENCY_CHOICES, default='EUR')
     toCurrencyCode = models.CharField(max_length=4, choices= CURRENCY_CHOICES, default= 'EUR')
     firstName = models.CharField(max_length=225)

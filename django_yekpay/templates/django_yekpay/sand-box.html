@@ -5,15 +5,15 @@
     <title>test Transaction</title>
 </head>
 <body>
-  <form action="{% url 'yekpay:sandbox-success' %}" method="get">
-    <input id="authoritys" type="hidden" name="authoritys" value="{{ authoritys }}">
-    <input id="authority" type="hidden" name="authority" value="{{ authorityv }}">
+  <form action="" method="post">
+    {% csrf_token %}
+    <input id="status_success" type="hidden" name="status" value="SUCCESS">
     <input type="submit" value="success">
   </form>
 
-  <form action="{% url 'yekpay:sandbox-fail' %}" method="get">
-    <input id="authoritys" type="hidden" name="authoritys" value="{{ authoritys }} ">
-    <input id="authority" type="hidden" name="authority" value="{{ authorityv }}">
+  <form action="" method="post">
+    {% csrf_token %}
+    <input id="status_fail" type="hidden" name="status" value="FAILED">
     <input type="submit" value="failed">
   </form>
 </body>
