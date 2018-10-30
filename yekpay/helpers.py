@@ -62,7 +62,7 @@ def yekpay_process_transaction(request, request_function=request_yekpay_verify):
             transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
             transaction.authorityVerify = str(request.GET['authority'])
             transaction.save(update_fields=['status', 'authorityVerify'])
-            return True
+            return transaction
         elif status == 'FAILED':
             if 'OrderNo' in trans_status:
                 transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
@@ -73,9 +73,11 @@ def yekpay_process_transaction(request, request_function=request_yekpay_verify):
                     transaction.failureReason = trans_status['Description']
                 transaction.save(update_fields=['status','authorityVerify','failureReason'])
                 logging.info(trans_status)
-                return False
+                return transaction
             else:
-                return False
+                return None
+    else:
+        return None
 
     # else:
     #     transaction = Transaction.objects.get(authorityVerify=request.GET['authority'])
