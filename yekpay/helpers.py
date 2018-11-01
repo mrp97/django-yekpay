@@ -24,6 +24,7 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay_st
     transaction = Transaction.objects.create_transaction(transaction_data)
     transaction_data['order_number'] = transaction.orderNumber.id
     start_transaction_data = generate_yekpay_start_transaction_data(transaction_data)
+    print(start_transaction_data)
     logging.info('starting transaction',transaction_data['order_number'])
     yekpay_response_data = request_function(
         data= start_transaction_data
@@ -51,12 +52,15 @@ def yekpay_process_transaction(request, request_function=request_yekpay_verify):
         if status == 'SUCCESS':
             transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
             transaction.authorityVerify = str(request.GET['authority'])
+            transaction.status = 'SUCCESS'
             transaction.save(update_fields=['status', 'authorityVerify'])
+            logging.info(f'Transaction {transaction.orderNumber.id} was successfull')
             return transaction
         elif status == 'FAILED':
             if 'OrderNo' in trans_status:
                 transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
                 transaction.authorityVerify = str(request.GET['authority'])
+                transaction.status = 'FAILED'
                 if 'PAYMENT_ERRORS' in trans_status:
                     transaction.failureReason = trans_status['PAYMENT_ERRORS']
                 else:
@@ -65,6 +69,7 @@ def yekpay_process_transaction(request, request_function=request_yekpay_verify):
                 logging.info(trans_status)
                 return transaction
             else:
+                logging.error(f'Transaction failed {trans_status}')
                 return None
     else:
         return None
