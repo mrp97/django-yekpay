@@ -5,10 +5,21 @@ from .exceptions import *
 
 def generate_yekpay_start_transaction_data(transaction_data):
     start_transaction_data = dict()
+    start_transaction_data['merchantId'] = MERCHANTID
+    start_transaction_data['amount'] = transaction_data['amount']
     start_transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['toCurrencyCode'])
     start_transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['fromCurrencyCode'])
-    start_transaction_data['merchantId'] = MERCHANTID
     start_transaction_data['orderNumber'] = transaction_data['order_number']
+    start_transaction_data['callback'] = transaction_data['callback_url']
+    start_transaction_data['firstName'] = transaction_data['firstName']
+    start_transaction_data['lastName'] = transaction_data['lastName']
+    start_transaction_data['email'] = transaction_data['email']
+    start_transaction_data['mobile'] = transaction_data['mobile']
+    start_transaction_data['address'] = transaction_data['address']
+    start_transaction_data['postalCode'] = transaction_data['postalCode']
+    start_transaction_data['country'] = transaction_data['country']
+    start_transaction_data['city'] = transaction_data['city']
+    start_transaction_data['description'] = transaction_data['description']
     return start_transaction_data
 
 def convert_currency_to_currency_code(currnecy):
