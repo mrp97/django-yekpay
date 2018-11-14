@@ -30,7 +30,7 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) #by module
     status = models.CharField(max_length=100,choices= TRANSACTION_STATUS_CHIOCES) # by module
     failureReason = models.CharField(max_length=100,blank=True,null=True) # by module
-
+    created_at = models.DateTimeField()
     objects = TransactionManager()
 
     def __repr__(self):
