@@ -7,30 +7,16 @@ test_django-yekpay
 
 Tests for `django-yekpay` utils module.
 """
-from yekpay import models,utils,config
-from tests import sandbox_api
 
 from django.test import TestCase
 from django.http import  HttpRequest
 
-
+from yekpay import models,utils,config
+from .sandbox_api import *
+from .test_data import transaction_data
 class TestDjango_yekpay_utils(TestCase):
 
     def setUp(self):
-        transaction_data = {
-            "amount": 10000,
-            "description": "some plan",
-            "fromCurrencyCode": 'IRR',
-            "toCurrencyCode": 'IRR',
-            "firstName": 'ship',
-            "lastName": "up",
-            "email": "ex@example.com",
-            "mobile": "+4455884976",
-            "address": "tehran",
-            "country": "Unaited Arab Emirates",
-            "postalCode": "64976",
-            "city": "Dubai",
-        }
         transaction = models.Transaction.objects.create_transaction(transaction_data)
         transaction.orderNumber = 1
         transaction.save(update_fields=['orderNumber'])
@@ -38,20 +24,6 @@ class TestDjango_yekpay_utils(TestCase):
 
     def test_yekpay_start_transaction_returns_gateway(self):
         """tests if user get redirected to yekpay's gateway"""
-        transaction_data = {
-            "amount": 10000,
-            "description": "some plan",
-            "fromCurrencyCode": 'IRR',
-            "toCurrencyCode": 'IRR',
-            "firstName": 'ship',
-            "lastName": "up",
-            "email": "ex@example.com",
-            "mobile": "+4455884976",
-            "address": "tehran",
-            "country": "Unaited Arab Emirates",
-            "postalCode": "64976",
-            "city": "Dubai",
-        }
         response = utils.yekpay_start_transaction(transaction_data)
         self.assertIn('Code', response[1])
         self.assertIn('Authority', response[1])
@@ -65,7 +37,7 @@ class TestDjango_yekpay_utils(TestCase):
         request.META['authority'] = 0
         response = utils.yekpay_process_transaction(
             request,
-            sandbox_api.sandbox_yekpay_failed_transaction
+            .sandbox_yekpay_failed_transaction
         )
         self.assertFalse(response)
 
@@ -77,7 +49,7 @@ class TestDjango_yekpay_utils(TestCase):
         request.META['authority'] = 0
         response = utils.yekpay_process_transaction(
             request,
-            sandbox_api.sandbox_yekpay_success_transaction
+            .sandbox_yekpay_success_transaction
         )
         self.assertTrue(response)
 

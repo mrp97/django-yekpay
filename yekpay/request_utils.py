@@ -11,9 +11,6 @@ def request_yekpay_start(data):
         gateway= YEKPAY_REQUEST_GATEWAY,
         data= data
     )
-    response_data.update({
-        'YekpayStartUrl': YEKPAY_START_GATEWAY + str(response_data['Authority'])
-    })
     return response_data
 
 def request_yekpay_verify(data):
@@ -34,12 +31,6 @@ def request_yekpay_start_simulation(data):
     yekpaySimulatedResponse['Code'] = 100
     yekpaySimulatedResponse['Authority'] = generate_random_authority()
     yekpaySimulatedResponse['Description'] = "Success"
-    yekpaySimulatedResponse['YekpayStartUrl'] = reverse(
-        'yekpay:sandbox-payment',
-        kwargs={
-            'authority_start': yekpaySimulatedResponse['Authority']
-        }
-    )
     return yekpaySimulatedResponse
 
 def request_yekpay_verify_simulation(data):
