@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Transaction
 from .utils import generate_random_authority
 from .helpers import yekpay_process_transaction
-
+from .request_utils import request_yekpay_verify
 
 def sandbox_pay(request, authority_start):
     if request.method == 'GET':
@@ -20,13 +20,24 @@ def sandbox_pay(request, authority_start):
         return redirect(f'{transaction.callback_url}?authority={transaction.authorityVerify}')
 
 
-def verify_transaction_view(request):
-    transaction = yekpay_process_transaction(request)
-    url = ""
-    order_number=int(request.GET.get('orderNo'))
-    if transaction is None:
-        transaction = Transaction.objects.get(order_number=order_number)
-    return redirect(url+'?on='+str(transaction.orderNumber.hash_id))
+def verify_transaction_view(request,transaction_order_number,request_function=request_yekpay_verify):
+    if YEKPAY_SIMULATION:
+        request_function = request_yekpay_verify_simulation
+    transaction = get_object_or_404(
+        Transaction,
+        order_number=transaction_order_number
+    )
+    trans_status = request_function(
+        data=  {
+            "merchantId": MERCHANTID,
+            "authority": request.GET['authority']
+        }
+    )
+    transaction = process_transaction_trans_status(
+        transaction,
+        trans_status
+    )
+    return redirect(transaction.get_client_callback_url())
 
 # class transactionsDetailView(DetailView):
 #     model = transactions

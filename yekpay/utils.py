@@ -1,25 +1,29 @@
 from random import randint
 
+from django.apps import apps
+from django.urls import reverse 
+ 
+
 from .config import *
 from .exceptions import *
 
-def generate_yekpay_start_transaction_data(transaction_data):
+def generate_yekpay_start_transaction_data(transaction):
     start_transaction_data = dict()
     start_transaction_data['merchantId'] = MERCHANTID
-    start_transaction_data['amount'] = transaction_data['amount']
-    start_transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction_data['to_currency_code'])
-    start_transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction_data['from_currency_code'])
-    start_transaction_data['orderNumber'] = transaction_data['order_number']
-    start_transaction_data['callback'] = transaction_data['callback_url']
-    start_transaction_data['firstName'] = transaction_data['first_name']
-    start_transaction_data['lastName'] = transaction_data['last_name']
-    start_transaction_data['email'] = transaction_data['email']
-    start_transaction_data['mobile'] = transaction_data['mobile']
-    start_transaction_data['address'] = transaction_data['address']
-    start_transaction_data['postalCode'] = transaction_data['postal_code']
-    start_transaction_data['country'] = transaction_data['country']
-    start_transaction_data['city'] = transaction_data['city']
-    start_transaction_data['description'] = transaction_data['description']
+    start_transaction_data['amount'] = transaction.amount
+    start_transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction.toCurrencyCoe)
+    start_transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction.fromCurrencyCode)
+    start_transaction_data['orderNumber'] = transaction.orderNumber.hashid
+    start_transaction_data['callback'] = get_call_back_url(transaction)
+    start_transaction_data['firstName'] = transaction.first_name
+    start_transaction_data['lastName'] = transaction.last_name
+    start_transaction_data['email'] = transaction.email
+    start_transaction_data['mobile'] = transaction.mobile
+    start_transaction_data['address'] = transaction.address
+    start_transaction_data['postalCode'] = transaction.postal_code
+    start_transaction_data['country'] = transaction.country
+    start_transaction_data['city'] = transaction.city
+    start_transaction_data['description'] = transaction.description
     return start_transaction_data
 
 def convert_currency_to_currency_code(currnecy):
@@ -44,10 +48,36 @@ def convert_string_status_to_code(status):
 def generate_random_authority():
     return randint(10000,99999)
 
-def get_call_back_url(transaction_data):
-    if 'callback_url' in transaction_data:
-        return transaction_data['callback_url']
-    elif hasattr(settings,'YEKPAY_CALLBACK_URL'):
+def get_call_back_url(transaction):
+    if hasattr(settings,'YEKPAY_CALLBACK_URL'):
         return settings.YEKPAY_CALLBACK_URL
     else:
-        raise CallbackUrlNotProvided("callback_url is not provided in the settings nor the transaction data")
+        return reverse(
+            'yekpay:verify_transaction',
+            kwargs = {
+                'transaction_order_number': transaction.order_number.hashid
+            }
+        )
+
+def get_transaction_from_trans_status(trans_status):
+    if 'OrderNo' in trans_status:
+        Transaction = apps.get_model('yekpay','Transaction')
+        return Transaction.objects.filter(
+            order_number=trans_status['OrderNo']
+        ).last()
+    return None
+
+def process_transaction_trans_status(transaction,trans_status):
+    if 'Code' in trans_status:
+        status = convert_status_code_to_string(trans_status['Code'])
+        if transaction:
+            transaction.status = status
+            transaction.save(update_fields='status')
+            if status == 'FAILED':
+                if 'PAYMENT_ERRORS' in trans_status:
+                    transaction.failure_reason = trans_status['PAYMENT_ERRORS']
+                else:
+                    transaction.failure_reason = trans_status['Description']
+            transaction.save(update_fields=['status','authority_verify','failure_reason'])           
+            return transaction
+    return None

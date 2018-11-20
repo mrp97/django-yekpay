@@ -33,8 +33,12 @@ urlpatterns = [
     #     view=views.transactionsListView.as_view(),
     #     name='transactions_list',
     # ),
-    path('sanbox-transaction/<int:authority_start>',
+    path('sanbox-transaction/<int:authority_start>/',
          views.sandbox_pay,
          name='sandbox-payment'
+    ),
+    path('verify/<str:transaction_order_number>/',
+        views.verify_transaction_view,
+        name='verify_transaction'
     ),
 	]

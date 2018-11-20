@@ -13,20 +13,16 @@ from .request_utils import ( request_yekpay, request_yekpay_start,
     request_yekpay_verify_simulation )
 from .utils import ( convert_status_code_to_string,
     convert_currency_to_currency_code, get_call_back_url,
-    generate_yekpay_start_transaction_data )
+    generate_yekpay_start_transaction_data, process_transaction_trans_status )
 
 logging.basicConfig(level=logging.DEBUG)
 
 def yekpay_start_transaction(transaction_data,request_function=request_yekpay_start):
     if YEKPAY_SIMULATION:
         request_function = request_yekpay_start_simulation
-    transaction_data['callback_url'] = get_call_back_url(transaction_data)
     transaction = Transaction.objects.create_transaction(transaction_data)
-    transaction_data['order_number'] = transaction.orderNumber.id
-    transaction_data['callback_url'] += f'?orderNo={transaction.orderNumber.id}'
-    start_transaction_data = generate_yekpay_start_transaction_data(transaction_data)
-    print(start_transaction_data)
-    logging.info('starting transaction',transaction_data['order_number'])
+    start_transaction_data = generate_yekpay_start_transaction_data(transaction)
+    logging.info('starting transaction',transaction.order_number)
     yekpay_response_data = request_function(
         data= start_transaction_data
     )
@@ -48,64 +44,14 @@ def yekpay_process_transaction(request, request_function=request_yekpay_verify):
             "authority": request.GET['authority']
         }
     )
-    if 'Code' in trans_status:
-        status = convert_status_code_to_string(trans_status['Code'])
-        if status == 'SUCCESS':
-            transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
-            transaction.authorityVerify = str(request.GET['authority'])
-            transaction.status = 'SUCCESS'
-            transaction.save(update_fields=['status', 'authorityVerify'])
-            logging.info(f'Transaction {transaction.orderNumber.id} was successfull')
-            return transaction
-        elif status == 'FAILED':
-            if 'OrderNo' in trans_status:
-                transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
-                transaction.authorityVerify = str(request.GET['authority'])
-                transaction.status = 'FAILED'
-                if 'PAYMENT_ERRORS' in trans_status:
-                    transaction.failureReason = trans_status['PAYMENT_ERRORS']
-                else:
-                    transaction.failureReason = trans_status['Description']
-                transaction.save(update_fields=['status','authorityVerify','failureReason'])
-                logging.info(trans_status)
-                return transaction
-            else:
-                logging.error(f'Transaction failed {trans_status}')
-                return None
-    else:
-        return None
-
-    # else:
-    #     transaction = Transaction.objects.get(authorityVerify=request.GET['authority'])
-    #     if transaction.status == 'SUCCESS':
-    #         return True
-    #     else:
-    #         return transaction.status
-
-        # if 'Code' in trans_status:
-        #     logging.info('verfiy',trans_status['OrderNo'])
-        #     transaction = Transaction.objects.get(orderNumber=trans_status['OrderNo'])
-        #     transaction.authorityVerify =  str(request.GET['authority'])
-        #     status = convert_status_code_to_string(trans_status['Code'])
-        #     if status:
-        #         transaction.status = status
-        #         if status == 'SUCCESS':
-        #             # transaction_succeed
-        #             transaction.save(update_fields=['status','authorityVerify'])
-        #             return True
-        #         elif status == 'FAILED':
-        #             # transaction_failed
-        #             transaction.failureReason = trans_status['PAYMENT_ERRORS']
-        #             transaction.save(update_fields=['status','authorityVerify','failureReason'])
-        #             logging.info(trans_status)
-        #             return False
-        #         else:
-        #             transaction.save(update_fields=['status','authorityVerify'])
-        #             logging.info(trans_status)
-        #             return False
-        #     else:
-        #         raise UnknownTransactionStatusCode("Status code was not found in defined status codes in yekpay.config!")
-        #
-        # else:
-        #     logging.error(trans_status)
-        #     raise UnknownTransactionFailure('There was an unknown problem in payment!')
+    transaction = get_transaction_from_trans_status(
+        trans_status
+    )
+    if transaction:
+        transaction.authority_verfiy = request.GET['authority']
+        trasaction.save(update_fields='authority_verify')
+    transaction = process_transaction_trans_status(
+        transaction,
+        trans_status
+    )
+    return transaction

@@ -10,6 +10,6 @@ class TransactionManager(models.Manager):
         transaction_data['status'] = 'PENDING'
         transaction_data['simulation'] = YEKPAY_SIMULATION
         createdTransaction = self.create(**transaction_data)
-        createdTransaction.orderNumber = createdTransaction.id
-        createdTransaction.save(update_fields=['orderNumber'])
+        createdTransaction.order_number = createdTransaction.id
+        createdTransaction.save(update_fields=['order_number'])
         return createdTransaction
