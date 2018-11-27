@@ -9,6 +9,7 @@ from .config import CURRENCY_CHOICES, TRANSACTION_STATUS_CHIOCES, YEKPAY_START_G
 from .exceptions import *
 from .managers import TransactionManager
 
+
 class Transaction(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,null=True)
     amount = models.DecimalField(max_digits=64, decimal_places=2, default=0, blank=True, null=True)
@@ -22,6 +23,7 @@ class Transaction(models.Model):
     last_name = models.CharField(max_length=225)
     email = models.CharField(max_length=225)
     mobile = models.CharField(max_length=225)
+
     order_number = HashidField(
         allow_int_lookup=True,
         blank=True,

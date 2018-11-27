@@ -7,6 +7,7 @@ from django.urls import reverse
 from .config import *
 from .exceptions import *
 
+
 def generate_yekpay_start_transaction_data(transaction):
     start_transaction_data = dict()
     start_transaction_data['merchantId'] = MERCHANTID
@@ -26,17 +27,20 @@ def generate_yekpay_start_transaction_data(transaction):
     start_transaction_data['description'] = transaction.description
     return start_transaction_data
 
+
 def convert_currency_to_currency_code(currnecy):
     if currnecy in CURRENCY_CODES:
         return CURRENCY_CODES[currnecy]
     else:
         return None
 
+
 def convert_status_code_to_string(statusCode):
     if statusCode in TRANSACTION_STATUS_CODES:
         return TRANSACTION_STATUS_CODES[statusCode]
     else:
         return None
+
 
 def convert_string_status_to_code(status):
     INVERSE_TRANSACTION_STATUS_CODES = {status: code for code, status in TRANSACTION_STATUS_CODES.items()}
@@ -45,8 +49,10 @@ def convert_string_status_to_code(status):
     else:
         return None
 
+
 def generate_random_authority():
     return randint(10000,99999)
+
 
 def get_call_back_url(transaction):
     if hasattr(settings,'YEKPAY_CALLBACK_URL'):
@@ -59,6 +65,7 @@ def get_call_back_url(transaction):
             }
         )
 
+
 def get_transaction_from_trans_status(trans_status):
     if 'OrderNo' in trans_status:
         Transaction = apps.get_model('yekpay','Transaction')
@@ -66,6 +73,7 @@ def get_transaction_from_trans_status(trans_status):
             order_number=trans_status['OrderNo']
         ).last()
     return None
+
 
 def process_transaction_trans_status(transaction,trans_status):
     if 'Code' in trans_status:
