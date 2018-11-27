@@ -18,7 +18,7 @@ transaction_wrong_data = {
             "description": "some plan",
             "from_currency_code": 'IRR',
             "to_currency_code": 'IRR',
-            "first_name": 'ship',
+            "first_name": '',
             "last_name": "up",
             "email": "ex@example.com",
             "mobile": "+4455884976",
