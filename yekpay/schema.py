@@ -6,6 +6,7 @@ from graphene import InputObjectType, relay
 from .helpers import yekpay_start_transaction
 from .request_utils import request_yekpay_start_simulation
 
+
 class TransactionNode(DjangoObjectType):
     class Meta:
         model = Transaction
@@ -28,11 +29,11 @@ class UserFields(graphene.InputObjectType):
 class AddressFields(graphene.InputObjectType):
     address = graphene.String(required=True)
     country = graphene.String(required=True)
-    postal_node = graphene.String(required=True)
+    postal_code = graphene.String(required=True)
     city = graphene.String(required=True)
 
 
-class TransactionCreateInput(graphene.InputObjectType):
+class TransactionFields(graphene.InputObjectType):
     callback_url = graphene.String(required=False)
     amount = graphene.Int(required=True)
     description = graphene.String(required=True)
@@ -42,68 +43,22 @@ class TransactionCreateInput(graphene.InputObjectType):
 
 class CreateTransaction(graphene.ClientIDMutation):
     class Arguments:
-        transaction_input = TransactionCreateInput
+        transaction_input = graphene.Field(TransactionFields)
         person_input = graphene.Field(UserFields)
         address_input = graphene.Field(AddressFields)
         simulation = graphene.Boolean(required=False)
     redirect_url = graphene.String(required=True)
     order_number = graphene.Int(required=True)
 
-
-    @staticmethod
     def mutate(self, info, transaction_input, person_input,address_input, simulation):
         if simulation is not False:
             transaction = yekpay_start_transaction(
                 request_function=request_yekpay_start_simulation,
-
                 **transaction_input
             )
         else:
             transaction = yekpay_start_transaction(**transaction_input)
-        #get user info
-        return CreateTransaction(
-            redirect_url=transaction.get_transaction_start_url(),
-            order_number=transaction.orderNumber.hashid
-        )
-
-
-class TransactionInput(graphene.InputObjectType):
-    first_name = graphene.String(required=True)
-    last_name = graphene.String(required=True)
-    email = graphene.String(required=True)
-    mobile = graphene.String(required=True)
-    address = graphene.String(required=True)
-    country = graphene.String(required=True)
-    postal_node = graphene.String(required=True)
-    city = graphene.String(required=True)
-    callback_url = graphene.String(required=False)
-    amount = graphene.Int(required=True)
-    description = graphene.String(required=True)
-    fromCurrencyCode = graphene.String(required=True)
-    toCurrencyCode = graphene.String(required=True)
-    simulation = graphene.String(required=False)
-
-
-class CreateTransaction2(graphene.ClientIDMutation):
-    class Arguments:
-        transaction_input = TransactionInput(required=False)
-
-    redirect_url = graphene.String(required=True)
-    order_number = graphene.Int(required=True)
-
-
-    @staticmethod
-    def mutate(self, info, transaction_input):
         # get user info
-
-        if transaction_input['simulation'] is not False:
-            transaction = yekpay_start_transaction(
-                request_function=request_yekpay_start_simulation,
-                **transaction_input
-            )
-        else:
-            transaction = yekpay_start_transaction(**transaction_input)
-
         return CreateTransaction(
             redirect_url=transaction.get_transaction_start_url(),
             order_number=transaction.orderNumber.hashid
