@@ -34,6 +34,7 @@ class Transaction(models.Model):
     postal_code= models.CharField(max_length=225)
     city = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True) #by module
+    successfull_payment_date_time = models.DateTimeField(blank=True,null=True) #by module
     status = models.CharField(max_length=100,choices= TRANSACTION_STATUS_CHIOCES) # by module
     failure_reason = models.CharField(max_length=100,blank=True,null=True) # by module
     simulation = models.BooleanField(default=False)

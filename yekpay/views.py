@@ -2,9 +2,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Transaction
-from .utils import generate_random_authority
+from .utils import generate_random_authority, process_transaction_trans_status
 from .helpers import yekpay_process_transaction
 from .request_utils import request_yekpay_verify
+
 
 def sandbox_pay(request, authority_start):
     if request.method == 'GET':
