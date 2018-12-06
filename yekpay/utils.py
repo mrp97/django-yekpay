@@ -12,9 +12,9 @@ def generate_yekpay_start_transaction_data(transaction):
     start_transaction_data = dict()
     start_transaction_data['merchantId'] = MERCHANTID
     start_transaction_data['amount'] = transaction.amount
-    start_transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction.toCurrencyCoe)
-    start_transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction.fromCurrencyCode)
-    start_transaction_data['orderNumber'] = transaction.orderNumber.hashid
+    start_transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction.to_currency_code)
+    start_transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction.from_currency_code)
+    start_transaction_data['orderNumber'] = transaction.order_number.hashid
     start_transaction_data['callback'] = get_call_back_url(transaction)
     start_transaction_data['firstName'] = transaction.first_name
     start_transaction_data['lastName'] = transaction.last_name

@@ -29,8 +29,8 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay_st
     )
     if yekpay_response_data['Code'] == 100:
         logging.info("returning redirecting url to yekpay's gateway")
-        transaction.authorityStart = str(yekpay_response_data['Authority'])
-        transaction.save(update_fields=['authorityStart'])
+        transaction.authority_start = str(yekpay_response_data['Authority'])
+        transaction.save(update_fields=['authority_start'])
         return transaction
     else:
         logging.error('django_yekpay error' + str(yekpay_response_data['Description']) + str(yekpay_response_data['Code']))

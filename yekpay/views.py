@@ -5,7 +5,7 @@ from .models import Transaction
 from .utils import generate_random_authority, process_transaction_trans_status
 from .helpers import yekpay_process_transaction
 from .request_utils import request_yekpay_verify
-
+from . import signals as yekpay_signals
 
 def sandbox_pay(request, authority_start):
     if request.method == 'GET':
@@ -14,11 +14,11 @@ def sandbox_pay(request, authority_start):
             'yekpay/sand-box.html'
         )
     elif request.method == 'POST':
-        transaction = Transaction.objects.get(authorityStart= authority_start)
+        transaction = Transaction.objects.get(authority_start= authority_start)
         transaction.status = request.POST['status']
-        transaction.authorityVerify = generate_random_authority()
-        transaction.save(update_fields=['authorityVerify', 'status'])
-        return redirect(f'{transaction.callback_url}?authority={transaction.authorityVerify}')
+        transaction.authority_verify = generate_random_authority()
+        transaction.save(update_fields=['authority_verify', 'status'])
+        return redirect(f'{transaction.callback_url}?authority={transaction.authority_verify}')
 
 
 def verify_transaction_view(request,transaction_order_number,request_function=request_yekpay_verify):
@@ -37,6 +37,10 @@ def verify_transaction_view(request,transaction_order_number,request_function=re
     transaction = process_transaction_trans_status(
         transaction,
         trans_status
+    )
+    yekpay_signals.transaction_verified.send(
+        sender=None,
+        transaction=transaction
     )
     return redirect(transaction.get_client_callback_url())
 

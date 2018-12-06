@@ -46,6 +46,9 @@ class Transaction(models.Model):
     def __str__(self):
         return "yekpay: {0}".format(self.order_number)
 
+    def is_successful(self):
+        return self.status == 'SUCCESS'
+        
     def get_transaction_start_url(self):
         if self.simulation is True:
             return YEKPAY_START_GATEWAY + self.authority_start

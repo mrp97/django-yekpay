@@ -10,7 +10,7 @@ from .request_utils import request_yekpay_start_simulation
 class TransactionNode(DjangoObjectType):
     class Meta:
         model = Transaction
-        filter_fields = ['orderNumber']
+        filter_fields = ['order_number']
         interfaces =(relay.Node,)
 
 
@@ -61,5 +61,5 @@ class CreateTransaction(graphene.ClientIDMutation):
         # get user info
         return CreateTransaction(
             redirect_url=transaction.get_transaction_start_url(),
-            order_number=transaction.orderNumber.hashid
+            order_number=transaction.order_number.hashid
         )

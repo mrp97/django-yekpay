@@ -36,6 +36,6 @@ def request_yekpay_start_simulation(data):
 def request_yekpay_verify_simulation(data):
     yekpaySimulatedResponse = dict()
     transaction = Transaction.objects.filter(authorityVerify= data['authority']).last()
-    yekpaySimulatedResponse['OrderNo']= transaction.orderNumber
+    yekpaySimulatedResponse['OrderNo']= transaction.order_number
     yekpaySimulatedResponse['Code']= convert_string_status_to_code(transaction.status)
     return yekpaySimulatedResponse

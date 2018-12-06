@@ -37,7 +37,7 @@ class YekpayAPITestCase(TestCase):
             }
         ''',transaction_data)
         self.assertMatchSnapshot(result)
-        transaction = models.Transaction.objects.get(orderNumber=result.get('order_number'))
+        transaction = models.Transaction.objects.get(order_number=result.get('order_number'))
         transaction.status = 'SUCCESS'
         self.assertMatchSnapshot(client.execute('''
             query Transaction($orderNumber: ID!)
