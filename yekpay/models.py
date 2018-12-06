@@ -49,16 +49,22 @@ class Transaction(models.Model):
     def is_successful(self):
         return self.status == 'SUCCESS'
         
-    def get_transaction_start_url(self):
-        if self.simulation is True:
+    def get_transaction_start_url(self,request=None):
+        if self.simulation is False:
             return YEKPAY_START_GATEWAY + self.authority_start
-        else:
-            return reverse(
+        else: 
+            relative_start_url = reverse(
                 'yekpay:sandbox-payment',
                 kwargs={
                     'authority_start': self.authority_start
                 }
             )
+            if request:
+                return request.build_absolute_uri(
+                    relative_start_url
+                )
+            else:
+                return relative_start_url
     
     def get_client_callback_url(self):
         if self.callback_url:

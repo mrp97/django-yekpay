@@ -23,7 +23,7 @@ def yekpay_start_transaction(transaction_data,request_function=request_yekpay_st
         request_function = request_yekpay_start_simulation
     transaction = Transaction.objects.create_transaction(transaction_data)
     start_transaction_data = generate_yekpay_start_transaction_data(transaction)
-    logging.info('starting transaction',transaction.order_number)
+    logging.info('starting transaction'+ transaction.order_number.hashid )
     yekpay_response_data = request_function(
         data= start_transaction_data
     )
