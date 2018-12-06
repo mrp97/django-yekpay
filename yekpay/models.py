@@ -34,7 +34,7 @@ class Transaction(models.Model):
     postal_code= models.CharField(max_length=225)
     city = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True) #by module
-    successfull_payment_date_time = models.DateTimeField(blank=True,null=True) #by module
+    successful_payment_date_time = models.DateTimeField(blank=True,null=True) #by module
     status = models.CharField(max_length=100,choices= TRANSACTION_STATUS_CHIOCES) # by module
     failure_reason = models.CharField(max_length=100,blank=True,null=True) # by module
     simulation = models.BooleanField(default=False)
@@ -66,9 +66,17 @@ class Transaction(models.Model):
             else:
                 return relative_start_url
     
+    def get_verify_url(self):
+        return reverse(
+            'yekpay:verify_transaction',
+            kwargs={
+                'transaction_order_number': self.order_number.hashid
+            }
+        )+f'?authority={self.authority_verify}'
+    
     def get_client_callback_url(self):
         if self.callback_url:
-            return self.callback_url + f'?orederNumber={self.callback_url}'
+            return self.callback_url + f'?orderNumber={self.order_number}'
         else:
             raise CallbackUrlNotProvided(
                 f"Callback url is not set in transaction with order number {self.order_number.hashid}"
