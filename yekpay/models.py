@@ -3,6 +3,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 from hashid_field import HashidField
 
 from .config import CURRENCY_CHOICES, TRANSACTION_STATUS_CHIOCES, YEKPAY_START_GATEWAY
@@ -23,7 +24,6 @@ class Transaction(models.Model):
     last_name = models.CharField(max_length=225)
     email = models.CharField(max_length=225)
     mobile = models.CharField(max_length=225)
-
     order_number = HashidField(
         allow_int_lookup=True,
         blank=True,
@@ -45,6 +45,30 @@ class Transaction(models.Model):
 
     def __str__(self):
         return "yekpay: {0}".format(self.order_number)
+
+    
+    def success(self):
+        self.status = "SUCCESS"
+        self.successful_payment_date_time = timezone.now()
+        self.save(
+            update_fields=[
+                'status',
+                'successful_payment_date_time'
+            ]
+        )
+
+    def fail(self,failure_reason=None):
+        self.status = "FAILED"
+        if failure_reason:
+            self.failure_reason = failure_reason
+        self.save(
+            update_fields=[
+                'status',
+                'failure_reason'
+            ]
+        )
+
+
 
     def is_successful(self):
         return self.status == 'SUCCESS'
