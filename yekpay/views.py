@@ -18,9 +18,13 @@ def sandbox_pay(request, authority_start):
         )
     elif request.method == 'POST':
         transaction = Transaction.objects.get(authority_start= authority_start)
-        transaction.status = request.POST['status']
+        transaction_status = request.POST['status']
+        if transaction_status == 'SUCCESS':
+            transaction.success()
+        elif transaction_status == 'FAILED':
+            transaction.fail()
         transaction.authority_verify = generate_random_authority()
-        transaction.save(update_fields=['authority_verify', 'status'])
+        transaction.save(update_fields=['authority_verify'])
         return redirect(
             transaction.get_verify_url()
         )
@@ -43,7 +47,6 @@ def verify_transaction_view(request,transaction_order_number,request_function=re
         transaction,
         trans_status
     )
-    print("transaction verification")
     yekpay_signals.transaction_verified.send(
         sender=None,
         transaction=transaction

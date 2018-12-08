@@ -2,7 +2,6 @@ from random import randint
 
 from django.apps import apps
 from django.urls import reverse 
-from django.utils import timezone
 
 from .config import *
 from .exceptions import *
@@ -79,15 +78,13 @@ def process_transaction_trans_status(transaction,trans_status):
     if 'Code' in trans_status:
         status = convert_status_code_to_string(trans_status['Code'])
         if transaction:
-            transaction.status = status
             if status == 'SUCCESS':
-                transaction.successful_payment_date_time = timezone.now()
-                transaction.save(update_fields=['status','successful_payment_date_time'])     
+                transaction.success()
             elif status == 'FAILED':
                 if 'PAYMENT_ERRORS' in trans_status:
-                    transaction.failure_reason = trans_status['PAYMENT_ERRORS']
+                    failure_reason = trans_status['PAYMENT_ERRORS']
                 else:
-                    transaction.failure_reason = trans_status['Description']
-                transaction.save(update_fields=['status','failure_reason'])           
+                    failure_reason = trans_status['Description']
+                transaction.fail(failure_reason=failure_reason)
             return transaction
     return None
