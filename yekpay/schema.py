@@ -13,6 +13,7 @@ from .request_utils import request_yekpay_start_simulation
 class TransactionNode(DjangoObjectType):
     class Meta:
         model = Transaction
+        exclude_fields = ('authority_start', 'authority_verify')
         interfaces =(relay.Node,)
 
 class TransactionFilter(django_filters.FilterSet):
