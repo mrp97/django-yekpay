@@ -14,12 +14,12 @@ from .managers import TransactionManager
 class Transaction(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE,null=True)
     amount = models.DecimalField(max_digits=64, decimal_places=2, default=0, blank=True, null=True)
-    authority_start = models.CharField(max_length=100,blank=True,null=True) #by module
-    authority_verify = models.CharField(max_length=100,blank=True,null=True) #by module
+    authority_start = models.CharField(max_length=100,blank=True,null=True)  # by module
+    authority_verify = models.CharField(max_length=100,blank=True,null=True)  # by module
     description = models.TextField()
     callback_url = models.CharField(max_length=100)
-    from_currency_code = models.CharField(max_length=4, choices= CURRENCY_CHOICES, default='EUR')
-    to_currency_code = models.CharField(max_length=4, choices= CURRENCY_CHOICES, default= 'EUR')
+    from_currency_code = models.CharField(max_length=4, choices=CURRENCY_CHOICES, default='EUR')
+    to_currency_code = models.CharField(max_length=4, choices=CURRENCY_CHOICES, default='EUR')
     first_name = models.CharField(max_length=225)
     last_name = models.CharField(max_length=225)
     email = models.CharField(max_length=225)
@@ -33,10 +33,10 @@ class Transaction(models.Model):
     country = models.CharField(max_length=225)
     postal_code = models.CharField(max_length=225)
     city = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True) #by module
-    successful_payment_date_time = models.DateTimeField(blank=True,null=True) #by module
-    status = models.CharField(max_length=100,choices= TRANSACTION_STATUS_CHIOCES) # by module
-    failure_reason = models.CharField(max_length=100,blank=True,null=True) # by module
+    created_at = models.DateTimeField(auto_now_add=True)  # by module
+    successful_payment_date_time = models.DateTimeField(blank=True,null=True)  # by module
+    status = models.CharField(max_length=100,choices= TRANSACTION_STATUS_CHIOCES)  # by module
+    failure_reason = models.CharField(max_length=100,blank=True,null=True)  # by module
     simulation = models.BooleanField(default=False)
     objects = TransactionManager()
 
@@ -45,7 +45,6 @@ class Transaction(models.Model):
 
     def __str__(self):
         return "yekpay: {0}".format(self.order_number)
-
     
     def success(self):
         self.status = "SUCCESS"
@@ -57,7 +56,7 @@ class Transaction(models.Model):
             ]
         )
 
-    def fail(self,failure_reason=None):
+    def fail(self, failure_reason=None):
         self.status = "FAILED"
         if failure_reason:
             self.failure_reason = failure_reason
