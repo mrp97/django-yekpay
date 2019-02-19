@@ -31,7 +31,7 @@ class Transaction(models.Model):
     )
     address = models.CharField(max_length=225)
     country = models.CharField(max_length=225)
-    postal_code= models.CharField(max_length=225)
+    postal_code = models.CharField(max_length=225)
     city = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True) #by module
     successful_payment_date_time = models.DateTimeField(blank=True,null=True) #by module
@@ -67,8 +67,6 @@ class Transaction(models.Model):
                 'failure_reason'
             ]
         )
-
-
 
     def is_successful(self):
         return self.status == 'SUCCESS'
