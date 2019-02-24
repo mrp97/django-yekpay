@@ -48,10 +48,7 @@ def yekpay_process_transaction(request, request_function=request_yekpay_verify):
     )
     transaction = get_transaction_from_trans_status(trans_status)
     if transaction:
-        transaction.authority_verfiy = request.GET['authority']
-        trasaction.save(update_fields='authority_verify')
-    transaction = process_transaction_trans_status(
-        transaction,
-        trans_status
-    )
+        transaction.authority_verify = request.GET["authority"]
+        transaction.save(update_fields="authority_verify")
+    transaction = process_transaction_trans_status(transaction, trans_status)
     return transaction
