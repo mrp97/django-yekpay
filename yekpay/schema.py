@@ -30,10 +30,7 @@ class TransactionFilter(django_filters.FilterSet):
         field_name="successful_payment_date_time", lookup_expr="lt"
     )
     failure_reason = django_filters.CharFilter(lookup_expr="icontains")
-    order_by = django_filters.OrderingFilter(
-        fields=(
-            ("created_at", "createdAt"),
-        ))
+    order_by = django_filters.OrderingFilter(fields=(("created_at", "createdAt"),))
 
     class Meta:
         model = Transaction
@@ -41,7 +38,7 @@ class TransactionFilter(django_filters.FilterSet):
 
     @property
     def qs(self):
-        return super().qs.filter(user=self.request.user).order_by('created_at')
+        return super().qs.filter(user=self.request.user).order_by("created_at")
 
 
 class YekpayQuery:
