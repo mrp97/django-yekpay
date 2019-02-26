@@ -50,3 +50,7 @@ TRANSACTION_STATUS_CHIOCES = (
     ('UNKNOWN', 'Transaction was failed with unknown error'),
     ('SUCCESS','Transaction was successfully done'),
 )
+
+FAILURE_REASONS = [
+    'test transaction failed',
+]
