@@ -23,11 +23,11 @@ class TransactionFilter(django_filters.FilterSet):
     created_at_before = django_filters.DateFilter(
         field_name="created_at", lookup_expr="lt"
     )
-    successful_payament_date_time_after = django_filters.DateFilter(
-        field_name="successful_payament_date_time", lookup_expr="gt"
+    successful_payment_date_time_after = django_filters.DateFilter(
+        field_name="successful_payment_date_time", lookup_expr="gt"
     )
-    successful_payament_date_time_before = django_filters.DateFilter(
-        field_name="successful_payament_date_time", lookup_expr="lt"
+    successful_payment_date_time_before = django_filters.DateFilter(
+        field_name="successful_payment_date_time", lookup_expr="lt"
     )
     failure_reason = django_filters.CharFilter(lookup_expr="icontains")
 
