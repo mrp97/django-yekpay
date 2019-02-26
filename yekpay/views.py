@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
+import random
+
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 
 from .models import Transaction
 from .utils import generate_random_authority, process_transaction_trans_status
-from .helpers import yekpay_process_transaction
 from .request_utils import request_yekpay_verify,request_yekpay_verify_simulation
-from .config import YEKPAY_SIMULATION,MERCHANTID
+from .config import YEKPAY_SIMULATION,MERCHANTID,FAILURE_REASONS
 from . import signals as yekpay_signals
 
 
@@ -22,7 +22,8 @@ def sandbox_pay(request, authority_start):
         if transaction_status == 'SUCCESS':
             transaction.success()
         elif transaction_status == 'FAILED':
-            transaction.fail()
+            random_failure_reason = FAILURE_REASONS[random.randint(0,len(FAILURE_REASONS))]
+            transaction.fail(random_failure_reason)
         transaction.authority_verify = generate_random_authority()
         transaction.save(update_fields=['authority_verify'])
         return redirect(
