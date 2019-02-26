@@ -52,6 +52,9 @@ class Transaction(models.Model):
     simulation = models.BooleanField(default=False)
     objects = TransactionManager()
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __repr__(self):
         return "<yekpay id:{0}>".format(self.order_number)
 
