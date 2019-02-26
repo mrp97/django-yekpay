@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from hashid_field import HashidField
 
-from .config import CURRENCY_CHOICES, TRANSACTION_STATUS_CHIOCES, YEKPAY_START_GATEWAY
+from .config import CURRENCY_CHOICES, TRANSACTION_STATUS_CHOICES, YEKPAY_START_GATEWAY
 from .exceptions import *
 from .managers import TransactionManager
 
@@ -44,7 +44,7 @@ class Transaction(models.Model):
         blank=True, null=True
     )  # by module
     status = models.CharField(
-        max_length=100, choices=TRANSACTION_STATUS_CHIOCES
+        max_length=100, choices=TRANSACTION_STATUS_CHOICES
     )  # by module
     failure_reason = models.CharField(
         max_length=100, blank=True, null=True
