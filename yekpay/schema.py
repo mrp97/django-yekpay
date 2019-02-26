@@ -38,7 +38,7 @@ class TransactionFilter(django_filters.FilterSet):
 
     @property
     def qs(self):
-        return super().qs.filter(user=self.request.user).order_by("-created_at")
+        return super().qs.filter(user=self.request.user)
 
 
 class YekpayQuery:
