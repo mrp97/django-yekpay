@@ -46,7 +46,6 @@ class Transaction(models.Model):
     def __str__(self):
         return "yekpay: {0}".format(self.order_number)
 
-    
     def success(self):
         self.status = "SUCCESS"
         self.successful_payment_date_time = timezone.now()
@@ -57,7 +56,7 @@ class Transaction(models.Model):
             ]
         )
 
-    def fail(self,failure_reason=None):
+    def fail(self, failure_reason=None):
         self.status = "FAILED"
         if failure_reason:
             self.failure_reason = failure_reason
