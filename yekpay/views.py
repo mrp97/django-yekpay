@@ -20,7 +20,7 @@ def sandbox_pay(request, authority_start):
             transaction.success()
         elif transaction_status == "FAILED":
             random_failure_reason = FAILURE_REASONS[
-                random.randint(0, len(FAILURE_REASONS))
+                random.randint(0, len(FAILURE_REASONS)-1)
             ]
             transaction.fail(random_failure_reason)
         transaction.authority_verify = generate_random_authority()
