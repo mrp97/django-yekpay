@@ -30,9 +30,9 @@ def generate_yekpay_start_transaction_data(transaction):
     return start_transaction_data
 
 
-def convert_currency_to_currency_code(currnecy):
-    if currnecy in CURRENCY_CODES:
-        return CURRENCY_CODES[currnecy]
+def convert_currency_to_currency_code(currency):
+    if currency in CURRENCY_CODES:
+        return CURRENCY_CODES[currency]
     else:
         return None
 
