@@ -1,7 +1,7 @@
 from random import randint
 
 from django.apps import apps
-from django.urls import reverse 
+from django.urls import reverse
 from django.contrib.sites.models import Site
 
 import logging
@@ -51,16 +51,16 @@ def convert_string_status_to_code(status):
 
 
 def generate_random_authority():
-    return randint(10000,99999)
+    return randint(10000, 99999)
 
 
 def get_call_back_url(transaction):
-    if hasattr(settings,'YEKPAY_CALLBACK_URL'):
+    if hasattr(settings, 'YEKPAY_CALLBACK_URL'):
         return settings.YEKPAY_CALLBACK_URL
     else:
         return Site.objects.get_current().domain + reverse(
             'yekpay:verify_transaction',
-            kwargs = {
+            kwargs={
                 'transaction_order_number': transaction.order_number.hashid
             }
         )
@@ -76,7 +76,7 @@ def get_transaction_from_trans_status(trans_status):
     return None
 
 
-def process_transaction_trans_status(transaction,trans_status):
+def process_transaction_trans_status(transaction, trans_status):
     if 'Code' in trans_status:
         status = convert_status_code_to_string(trans_status['Code'])
         if transaction:
