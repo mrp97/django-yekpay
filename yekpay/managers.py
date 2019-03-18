@@ -1,15 +1,24 @@
-from django.conf import settings
-from django.db import models
+from datetime import timedelta
 
-from .exceptions import *
+from django.db import models
+from django.utils import timezone
+
 from .config import YEKPAY_SIMULATION
+
+
 class TransactionManager(models.Manager):
     """ Manager for :class:`Transaction` """
 
     def create_transaction(self, transaction_data):
         transaction_data['status'] = 'PENDING'
         transaction_data['simulation'] = YEKPAY_SIMULATION
-        createdTransaction = self.create(**transaction_data)
-        createdTransaction.order_number = createdTransaction.id
-        createdTransaction.save(update_fields=['order_number'])
-        return createdTransaction
+        created_transaction = self.create(**transaction_data)
+        created_transaction.order_number = created_transaction.id
+        created_transaction.save(update_fields=['order_number'])
+        return created_transaction
+
+    def get_old_pending_transactions(self):
+        return self.filter(
+            created_at__lt=timezone.now() - timedelta(minutes=30),
+            status='PENDING'
+        )
