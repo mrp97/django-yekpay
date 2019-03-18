@@ -39,6 +39,10 @@ TRANSACTION_STATUS_CODES = {
     100: "SUCCESS",
 }
 
+INVERSE_TRANSACTION_STATUS_CODES = {
+    status: code for code, status in TRANSACTION_STATUS_CODES.items()
+}
+
 TRANSACTION_STATUS_CHOICES = (
     ("PENDING", "Transaction has just started"),
     ("INCOMPLETE_PARAMETERS", "Transaction parameters were incomplete"),
