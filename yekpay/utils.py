@@ -2,6 +2,7 @@ from random import randint
 
 from django.apps import apps
 from django.urls import reverse 
+from django.contrib.sites.models import Site
 
 from .config import *
 from .exceptions import *
@@ -13,7 +14,7 @@ def generate_yekpay_start_transaction_data(transaction):
     start_transaction_data['amount'] = transaction.amount
     start_transaction_data['toCurrencyCode'] = convert_currency_to_currency_code(transaction.to_currency_code)
     start_transaction_data['fromCurrencyCode'] = convert_currency_to_currency_code(transaction.from_currency_code)
-    start_transaction_data['orderNumber'] = transaction.order_number.hashid
+    start_transaction_data['orderNumber'] = transaction.order_number.id + 100
     start_transaction_data['callback'] = get_call_back_url(transaction)
     start_transaction_data['firstName'] = transaction.first_name
     start_transaction_data['lastName'] = transaction.last_name
@@ -57,7 +58,7 @@ def get_call_back_url(transaction):
     if hasattr(settings,'YEKPAY_CALLBACK_URL'):
         return settings.YEKPAY_CALLBACK_URL
     else:
-        return reverse(
+        return Site.objects.get_current().domain + reverse(
             'yekpay:verify_transaction',
             kwargs = {
                 'transaction_order_number': transaction.order_number.hashid
