@@ -2,6 +2,7 @@
 import random
 
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Transaction
 from .utils import generate_random_authority, process_transaction_trans_status
@@ -27,7 +28,7 @@ def sandbox_pay(request, authority_start):
         transaction.save(update_fields=["authority_verify"])
         return redirect(transaction.get_verify_url())
 
-
+@csrf_exempt
 def verify_transaction_view(
     request, transaction_order_number, request_function=request_yekpay_verify
 ):
