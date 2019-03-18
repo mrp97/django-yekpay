@@ -7,7 +7,6 @@ from django.contrib.sites.models import Site
 import logging
 
 from .config import *
-from .exceptions import *
 
 
 def generate_yekpay_start_transaction_data(transaction):
@@ -37,15 +36,14 @@ def convert_currency_to_currency_code(currency):
         return None
 
 
-def convert_status_code_to_string(statusCode):
-    if statusCode in TRANSACTION_STATUS_CODES:
-        return TRANSACTION_STATUS_CODES[statusCode]
+def convert_status_code_to_string(status_code):
+    if status_code in TRANSACTION_STATUS_CODES:
+        return TRANSACTION_STATUS_CODES[status_code]
     else:
         return None
 
 
 def convert_string_status_to_code(status):
-    INVERSE_TRANSACTION_STATUS_CODES = {status: code for code, status in TRANSACTION_STATUS_CODES.items()}
     if status in INVERSE_TRANSACTION_STATUS_CODES:
         return INVERSE_TRANSACTION_STATUS_CODES[status]
     else:
