@@ -4,6 +4,8 @@ from django.apps import apps
 from django.urls import reverse 
 from django.contrib.sites.models import Site
 
+import logging
+
 from .config import *
 from .exceptions import *
 
@@ -68,10 +70,11 @@ def get_call_back_url(transaction):
 
 def get_transaction_from_trans_status(trans_status):
     if 'OrderNo' in trans_status:
-        Transaction = apps.get_model('yekpay','Transaction')
+        Transaction = apps.get_model('yekpay', 'Transaction')
         return Transaction.objects.filter(
             order_number=trans_status['OrderNo']
         ).last()
+    logging.error("there is no OrderNo in transaction status to verify transaction")
     return None
 
 
