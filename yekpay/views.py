@@ -28,6 +28,7 @@ def sandbox_pay(request, authority_start):
         transaction.save(update_fields=["authority_verify"])
         return redirect(transaction.get_verify_url())
 
+
 @csrf_exempt
 def verify_transaction_view(
     request, transaction_order_number, request_function=request_yekpay_verify
@@ -41,11 +42,3 @@ def verify_transaction_view(
     transaction = process_transaction_trans_status(transaction, trans_status)
     yekpay_signals.transaction_verified.send(sender=None, transaction=transaction)
     return redirect(transaction.get_client_callback_url())
-
-
-# class transactionsDetailView(DetailView):
-#     model = transactions
-#
-#
-# class transactionsListView(ListView):
-#     model = transactions
