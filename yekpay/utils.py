@@ -55,8 +55,8 @@ def generate_random_authority():
 
 
 def get_call_back_url(transaction):
-    if hasattr(settings, 'YEKPAY_CALLBACK_URL'):
-        return settings.YEKPAY_CALLBACK_URL
+    if YEKPAY_CALLBACK_URL:
+        return YEKPAY_CALLBACK_URL
     else:
         return "http" + "://" + Site.objects.get_current().domain + reverse(
             'yekpay:verify_transaction',
