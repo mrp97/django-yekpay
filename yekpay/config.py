@@ -2,6 +2,7 @@ from django.conf import settings
 
 MERCHANTID = getattr(settings, "YEKPAY_MERCHANT_ID", "")
 YEKPAY_SIMULATION = getattr(settings, "YEKPAY_SIMULATION", False)
+YEKPAY_CALLBACK_URL = getattr(settings, 'YEKPAY_CALLBACK_URL', None)
 YEKPAY_START_GATEWAY = "https://gate.yekpay.com/api/payment/start/"
 YEKPAY_VERIFY_GATEWAY = "https://gate.yekpay.com/api/payment/verify"
 YEKPAY_REQUEST_GATEWAY = "https://gate.yekpay.com/api/payment/request"
