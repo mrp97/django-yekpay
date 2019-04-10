@@ -31,7 +31,9 @@ def sandbox_pay(request, authority_start):
 
 @csrf_exempt
 def verify_transaction_view(
-    request, transaction_order_number, request_function=request_yekpay_verify
+    request,
+    transaction_order_number,
+    request_function=request_yekpay_verify
 ):
     if YEKPAY_SIMULATION:
         request_function = request_yekpay_verify_simulation
