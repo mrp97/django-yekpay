@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-from .exceptions import NotValidAmount
+from .exceptions import NotValidAmount, YekpayException
 from .models import Transaction
 from .config import *
 from .request_utils import (
@@ -39,6 +39,8 @@ def yekpay_start_transaction(transaction_data, request_function=request_yekpay_s
         )
         if str(yekpay_response_data["Code"]) == "-12":
             raise NotValidAmount(str(yekpay_response_data["Description"]))
+        else:
+            raise YekpayException(str(yekpay_response_data["Description"]))
 
 
 def yekpay_process_transaction(request, request_function=request_yekpay_verify):
