@@ -23,7 +23,7 @@ class Transaction(models.Model):
         max_length=100, blank=True, null=True
     )  # by module
     description = models.TextField()
-    callback_url = models.CharField(max_length=100)
+    callback_url = models.CharField(max_length=1000)
     from_currency_code = models.CharField(
         max_length=4, choices=CURRENCY_CHOICES, default="EUR"
     )
