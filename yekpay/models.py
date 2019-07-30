@@ -5,7 +5,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 from hashid_field import HashidField
-
+from urllib import parse as urlparse
+from urllib.parse import urlencode
 from .config import CURRENCY_CHOICES, TRANSACTION_STATUS_CHOICES, YEKPAY_START_GATEWAY
 from .exceptions import *
 from .managers import TransactionManager
@@ -60,6 +61,9 @@ class Transaction(models.Model):
 
     def __str__(self):
         return "yekpay: {0}".format(self.order_number)
+    
+    def get_order_number(self):
+        return self.order_number.hashid
 
     def success(self):
         self.status = "SUCCESS"
@@ -99,7 +103,13 @@ class Transaction(models.Model):
 
     def get_client_callback_url(self):
         if self.callback_url:
-            return self.callback_url + f"?orderNumber={self.order_number}"
+            url_parts = list(urlparse.urlparse(self.callback_url))
+            query = dict(urlparse.parse_qsl(url_parts[4]))
+            params = {'orderNumber': self.order_number}
+            query.update(params)
+            url_parts[4] = urlencode(query)
+            print(urlparse.urlunparse(url_parts))
+            return urlparse.urlunparse(url_parts)
         else:
             raise CallbackUrlNotProvided(
                 f"Callback url is not set in transaction with order number {self.order_number.hashid}"

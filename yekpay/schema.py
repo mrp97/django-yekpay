@@ -8,6 +8,7 @@ from .models import Transaction
 
 
 class TransactionNode(DjangoObjectType):
+    order_number = graphene.String(source="get_order_number")
     class Meta:
         model = Transaction
         exclude_fields = ("authority_start", "authority_verify")
