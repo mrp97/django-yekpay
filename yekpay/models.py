@@ -7,13 +7,19 @@ from django.utils import timezone
 from hashid_field import HashidField
 from urllib import parse as urlparse
 from urllib.parse import urlencode
-from .config import CURRENCY_CHOICES, TRANSACTION_STATUS_CHOICES, YEKPAY_START_GATEWAY
+from .config import (
+    CURRENCY_CHOICES,
+    TRANSACTION_STATUS_CHOICES,
+    YEKPAY_START_GATEWAY,
+)
 from .exceptions import *
 from .managers import TransactionManager
 
 
 class Transaction(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, null=True
+    )
     amount = models.DecimalField(
         max_digits=64, decimal_places=2, default=0, blank=True, null=True
     )
@@ -44,6 +50,7 @@ class Transaction(models.Model):
     successful_payment_date_time = models.DateTimeField(
         blank=True, null=True
     )  # by module
+    failure_date_time = models.DateTimeField(blank=True, null=True)
     status = models.CharField(
         max_length=100, choices=TRANSACTION_STATUS_CHOICES
     )  # by module
@@ -54,14 +61,14 @@ class Transaction(models.Model):
     objects = TransactionManager()
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __repr__(self):
         return "<yekpay id:{0}>".format(self.order_number)
 
     def __str__(self):
         return "yekpay: {0}".format(self.order_number)
-    
+
     def get_order_number(self):
         return self.order_number.hashid
 
@@ -72,9 +79,12 @@ class Transaction(models.Model):
 
     def fail(self, failure_reason=None):
         self.status = "FAILED"
+        self.failure_date_time = timezone.now()
         if failure_reason:
             self.failure_reason = failure_reason
-        self.save(update_fields=["status", "failure_reason"])
+        self.save(
+            update_fields=["status", "failure_date_time", "failure_reason"]
+        )
 
     def is_successful(self):
         return self.status == "SUCCESS"
@@ -105,7 +115,7 @@ class Transaction(models.Model):
         if self.callback_url:
             url_parts = list(urlparse.urlparse(self.callback_url))
             query = dict(urlparse.parse_qsl(url_parts[4]))
-            params = {'orderNumber': self.order_number}
+            params = {"orderNumber": self.order_number}
             query.update(params)
             url_parts[4] = urlencode(query)
             print(urlparse.urlunparse(url_parts))
