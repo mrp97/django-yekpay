@@ -8,7 +8,9 @@ class TransactionAdmin(admin.ModelAdmin):
         "email",
         "status",
         "amount",
+        "created_at",
         "successful_payment_date_time",
+        "failure_date_time",
     ]
 
 
