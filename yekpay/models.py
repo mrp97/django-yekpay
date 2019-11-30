@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import JSONField
 from django.urls import reverse
 from django.utils import timezone
 from hashid_field import HashidField
@@ -31,6 +32,9 @@ class Transaction(models.Model):
     )  # by module
     description = models.TextField()
     callback_url = models.CharField(max_length=1000)
+    additional_callback_params = JSONField(
+        max_length=1000, default={}, blank=True, null=True
+    )
     from_currency_code = models.CharField(
         max_length=4, choices=CURRENCY_CHOICES, default="EUR"
     )
@@ -112,11 +116,13 @@ class Transaction(models.Model):
         )
 
     def get_client_callback_url(self):
+        self.refresh_from_db()
         if self.callback_url:
             url_parts = list(urlparse.urlparse(self.callback_url))
             query = dict(urlparse.parse_qsl(url_parts[4]))
             params = {"orderNumber": self.order_number}
             query.update(params)
+            query.update(self.additional_callback_params)
             url_parts[4] = urlencode(query)
             print(urlparse.urlunparse(url_parts))
             return urlparse.urlunparse(url_parts)
@@ -124,3 +130,7 @@ class Transaction(models.Model):
             raise CallbackUrlNotProvided(
                 f"Callback url is not set in transaction with order number {self.order_number.hashid}"
             )
+    
+    def set_additional_callback_params(self,params_to_set):
+        self.additional_callback_params = params_to_set
+        self.save(update_fields=["additional_callback_params"])
