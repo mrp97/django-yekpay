@@ -1,10 +1,12 @@
 from django.contrib import admin
+
 from .models import Transaction
 
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = [
         "user",
+        "user__email",
         "email",
         "status",
         "amount",
@@ -15,4 +17,3 @@ class TransactionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Transaction, TransactionAdmin)
-
