@@ -6,8 +6,6 @@ from .models import Transaction
 class TransactionAdmin(admin.ModelAdmin):
     list_display = [
         "user",
-        "user__email",
-        "email",
         "status",
         "amount",
         "created_at",
