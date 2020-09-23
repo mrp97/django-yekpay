@@ -12,6 +12,7 @@ class TransactionAdmin(admin.ModelAdmin):
         "successful_payment_date_time",
         "failure_date_time",
     ]
+    search_fields = ("email", "first_name", "last_name")
 
 
 admin.site.register(Transaction, TransactionAdmin)
