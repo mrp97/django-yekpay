@@ -2,17 +2,25 @@
 
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import JSONField
 from django.urls import reverse
 from django.utils import timezone
 from hashid_field import HashidField
-
-from .config import CURRENCY_CHOICES, TRANSACTION_STATUS_CHOICES, YEKPAY_START_GATEWAY
+from urllib import parse as urlparse
+from urllib.parse import urlencode
+from .config import (
+    CURRENCY_CHOICES,
+    TRANSACTION_STATUS_CHOICES,
+    YEKPAY_START_GATEWAY,
+)
 from .exceptions import *
 from .managers import TransactionManager
 
 
 class Transaction(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, null=True
+    )
     amount = models.DecimalField(
         max_digits=64, decimal_places=2, default=0, blank=True, null=True
     )
@@ -24,6 +32,9 @@ class Transaction(models.Model):
     )  # by module
     description = models.TextField()
     callback_url = models.CharField(max_length=1000)
+    additional_callback_params = JSONField(
+        max_length=1000, default={}, blank=True, null=True
+    )
     from_currency_code = models.CharField(
         max_length=4, choices=CURRENCY_CHOICES, default="EUR"
     )
@@ -43,6 +54,7 @@ class Transaction(models.Model):
     successful_payment_date_time = models.DateTimeField(
         blank=True, null=True
     )  # by module
+    failure_date_time = models.DateTimeField(blank=True, null=True)
     status = models.CharField(
         max_length=100, choices=TRANSACTION_STATUS_CHOICES
     )  # by module
@@ -53,13 +65,16 @@ class Transaction(models.Model):
     objects = TransactionManager()
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __repr__(self):
         return "<yekpay id:{0}>".format(self.order_number)
 
     def __str__(self):
         return "yekpay: {0}".format(self.order_number)
+
+    def get_order_number(self):
+        return self.order_number.hashid
 
     def success(self):
         self.status = "SUCCESS"
@@ -68,9 +83,12 @@ class Transaction(models.Model):
 
     def fail(self, failure_reason=None):
         self.status = "FAILED"
+        self.failure_date_time = timezone.now()
         if failure_reason:
             self.failure_reason = failure_reason
-        self.save(update_fields=["status", "failure_reason"])
+        self.save(
+            update_fields=["status", "failure_date_time", "failure_reason"]
+        )
 
     def is_successful(self):
         return self.status == "SUCCESS"
@@ -98,9 +116,21 @@ class Transaction(models.Model):
         )
 
     def get_client_callback_url(self):
+        self.refresh_from_db()
         if self.callback_url:
-            return self.callback_url + f"?orderNumber={self.order_number}"
+            url_parts = list(urlparse.urlparse(self.callback_url))
+            query = dict(urlparse.parse_qsl(url_parts[4]))
+            params = {"orderNumber": self.order_number}
+            query.update(params)
+            query.update(self.additional_callback_params)
+            url_parts[4] = urlencode(query)
+            print(urlparse.urlunparse(url_parts))
+            return urlparse.urlunparse(url_parts)
         else:
             raise CallbackUrlNotProvided(
                 f"Callback url is not set in transaction with order number {self.order_number.hashid}"
             )
+    
+    def set_additional_callback_params(self,params_to_set):
+        self.additional_callback_params = params_to_set
+        self.save(update_fields=["additional_callback_params"])

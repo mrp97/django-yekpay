@@ -42,5 +42,5 @@ def verify_transaction_view(
         data={"merchantId": MERCHANTID, "authority": request.GET["authority"]}
     )
     transaction = process_transaction_trans_status(transaction, trans_status)
-    yekpay_signals.transaction_verified.send(sender=None, transaction=transaction)
+    yekpay_signals.transaction_verified.send(sender=None, transaction=transaction, request=request)
     return redirect(transaction.get_client_callback_url())
