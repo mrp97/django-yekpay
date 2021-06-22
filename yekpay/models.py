@@ -2,7 +2,6 @@
 
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.fields import JSONField
 from django.urls import reverse
 from django.utils import timezone
 from hashid_field import HashidField
@@ -32,7 +31,7 @@ class Transaction(models.Model):
     )  # by module
     description = models.TextField()
     callback_url = models.CharField(max_length=1000)
-    additional_callback_params = JSONField(
+    additional_callback_params = models.JSONField(
         max_length=1000, default={}, blank=True, null=True
     )
     from_currency_code = models.CharField(
