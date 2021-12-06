@@ -13,7 +13,13 @@ class TransactionAdmin(admin.ModelAdmin):
         "failure_date_time",
     ]
     search_fields = ("user__email", "user__first_name", "user__last_name")
-    list_filter = ("status", "create_at", "successful_payment_date_time")
+    list_filter = (
+        "status",
+        "created_at",
+        "successful_payment_date_time",
+        "failure_date_time",
+        "amount",
+    )
 
 
 admin.site.register(Transaction, TransactionAdmin)
